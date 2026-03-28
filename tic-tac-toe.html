@@ -158,9 +158,9 @@
 <body>
   <main class="app">
     <h1>Tic Tac Toe</h1>
-    <p class="subtitle">A simple two-player game in one file.</p>
+    <p class="subtitle">A simple human vs computer game in one file.</p>
 
-    <div class="status" id="status">Player X starts</div>
+    <div class="status" id="status">Your turn (X)</div>
 
     <section class="board" id="board" aria-label="Tic Tac Toe board"></section>
 
@@ -170,9 +170,9 @@
     </div>
 
     <section class="scoreboard" aria-label="Scoreboard">
-      <div class="score">X Wins<strong id="xScore">0</strong></div>
+      <div class="score">You<strong id="xScore">0</strong></div>
       <div class="score">Draws<strong id="drawScore">0</strong></div>
-      <div class="score">O Wins<strong id="oScore">0</strong></div>
+      <div class="score">Computer<strong id="oScore">0</strong></div>
     </section>
   </main>
 
@@ -200,6 +200,8 @@
     let currentPlayer = "X";
     let isGameOver = false;
     let scores = { X: 0, O: 0, draw: 0 };
+    const humanPlayer = "X";
+    const computerPlayer = "O";
 
     function createBoard() {
       boardEl.innerHTML = "";
@@ -225,28 +227,76 @@
     function handleMove(event) {
       const index = Number(event.currentTarget.dataset.index);
 
-      if (board[index] || isGameOver) {
+      if (board[index] || isGameOver || currentPlayer !== humanPlayer) {
         return;
       }
 
-      board[index] = currentPlayer;
+      board[index] = humanPlayer;
+      finishTurn();
+    }
 
+    function finishTurn() {
       const winner = getWinner();
       if (winner) {
         isGameOver = true;
         scores[winner] += 1;
-        updateStatus(`Player ${winner} wins!`);
+        updateStatus(winner === humanPlayer ? "You win!" : "Computer wins!");
       } else if (board.every(Boolean)) {
         isGameOver = true;
         scores.draw += 1;
         updateStatus("It's a draw!");
       } else {
-        currentPlayer = currentPlayer === "X" ? "O" : "X";
-        updateStatus(`Player ${currentPlayer}'s turn`);
+        currentPlayer = currentPlayer === humanPlayer ? computerPlayer : humanPlayer;
+        updateStatus(currentPlayer === humanPlayer ? "Your turn (X)" : "Computer is thinking...");
       }
 
       updateScores();
       createBoard();
+
+      if (!isGameOver && currentPlayer === computerPlayer) {
+        window.setTimeout(makeComputerMove, 350);
+      }
+    }
+
+    function makeComputerMove() {
+      if (isGameOver || currentPlayer !== computerPlayer) {
+        return;
+      }
+
+      const bestMove = findBestMove();
+      if (bestMove === null) {
+        return;
+      }
+
+      board[bestMove] = computerPlayer;
+      finishTurn();
+    }
+
+    function findBestMove() {
+      const openCells = board
+        .map((value, index) => (value ? null : index))
+        .filter((value) => value !== null);
+
+      for (const index of openCells) {
+        board[index] = computerPlayer;
+        if (getWinner() === computerPlayer) {
+          board[index] = "";
+          return index;
+        }
+        board[index] = "";
+      }
+
+      for (const index of openCells) {
+        board[index] = humanPlayer;
+        if (getWinner() === humanPlayer) {
+          board[index] = "";
+          return index;
+        }
+        board[index] = "";
+      }
+
+      const preferredMoves = [4, 0, 2, 6, 8, 1, 3, 5, 7];
+      return preferredMoves.find((index) => board[index] === "") ?? null;
     }
 
     function getWinner() {
@@ -270,9 +320,9 @@
 
     function resetBoard() {
       board = Array(9).fill("");
-      currentPlayer = "X";
+      currentPlayer = humanPlayer;
       isGameOver = false;
-      updateStatus("Player X starts");
+      updateStatus("Your turn (X)");
       createBoard();
     }
 
