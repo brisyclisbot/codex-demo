@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini App Library</title>
+  <style>
+    :root {
+      --bg: radial-gradient(circle at top, #f9eddc 0%, #f1e1cf 25%, #d6e3f2 100%);
+      --panel: rgba(255, 255, 255, 0.82);
+      --panel-strong: rgba(255, 255, 255, 0.94);
+      --text: #1c2230;
+      --muted: #586174;
+      --line: rgba(28, 34, 48, 0.12);
+      --accent: #c8553d;
+      --accent-deep: #244c74;
+      --shadow: 0 24px 60px rgba(28, 34, 48, 0.16);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 32px 20px 48px;
+      font-family: "Trebuchet MS", "Avenir Next", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    .shell {
+      width: min(100%, 980px);
+      margin: 0 auto;
+    }
+
+    .hero {
+      padding: 28px;
+      border-radius: 30px;
+      background: var(--panel);
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 14px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(36, 76, 116, 0.1);
+      color: var(--accent-deep);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(2.2rem, 7vw, 4.8rem);
+      line-height: 0.92;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .intro {
+      max-width: 46rem;
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.55;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .card {
+      padding: 22px;
+      border-radius: 24px;
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+      box-shadow: 0 14px 30px rgba(28, 34, 48, 0.08);
+    }
+
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 1.35rem;
+    }
+
+    .card p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .meta {
+      display: inline-block;
+      margin-bottom: 14px;
+      color: var(--accent);
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 140px;
+      padding: 12px 18px;
+      border-radius: 999px;
+      background: var(--accent-deep);
+      color: white;
+      text-decoration: none;
+      font-weight: 700;
+      transition: transform 140ms ease, box-shadow 140ms ease;
+      box-shadow: 0 10px 18px rgba(36, 76, 116, 0.18);
+    }
+
+    .link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 24px rgba(36, 76, 116, 0.22);
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <span class="eyebrow">Single-Page Apps</span>
+      <h1>Mini App Library</h1>
+      <p class="intro">
+        This page is the entry point for the small apps we build in this workspace.
+        As new pages are added, they can be linked here so everything stays easy to browse from one place.
+      </p>
+
+      <section class="grid" aria-label="App list">
+        <article class="card">
+          <span class="meta">Game</span>
+          <h2>Tic Tac Toe</h2>
+          <p>
+            A simple two-player game with score tracking, round resets, and a self-contained single HTML file.
+          </p>
+          <a class="link" href="tic-tac-toe.html">Open App</a>
+        </article>
+      </section>
+
+      <p class="footer-note">
+        Future apps can be added as more cards linking to their own standalone HTML pages.
+      </p>
+    </section>
+  </main>
+</body>
+</html>
