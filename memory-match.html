@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memory Match</title>
+  <style>
+    :root {
+      --bg: linear-gradient(160deg, #0d1f2d 0%, #12344a 45%, #f3b85a 140%);
+      --panel: rgba(9, 22, 33, 0.78);
+      --panel-strong: rgba(10, 24, 37, 0.9);
+      --card-back: linear-gradient(145deg, #f3b85a, #e06b44);
+      --card-front: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(240, 246, 250, 0.92));
+      --text: #eef6fb;
+      --text-dark: #132535;
+      --muted: rgba(238, 246, 251, 0.72);
+      --line: rgba(255, 255, 255, 0.1);
+      --accent: #f3b85a;
+      --accent-2: #68d1c5;
+      --success: #87e0a2;
+      --danger: #ff8d75;
+      --shadow: 0 22px 70px rgba(3, 10, 17, 0.36);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 24px;
+      font-family: "Avenir Next", "Trebuchet MS", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(104, 209, 197, 0.16), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(243, 184, 90, 0.18), transparent 28%),
+        var(--bg);
+    }
+
+    .shell {
+      width: min(1080px, 100%);
+      margin: 0 auto;
+    }
+
+    .hero {
+      padding: 30px;
+      border-radius: 32px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      color: #0d2936;
+      background: linear-gradient(135deg, var(--accent), #ffdca0);
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 18px 0 10px;
+      font-size: clamp(2.6rem, 8vw, 5.4rem);
+      line-height: 0.92;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .intro {
+      max-width: 52rem;
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.04rem;
+      line-height: 1.6;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+      gap: 22px;
+      margin-top: 26px;
+      align-items: start;
+    }
+
+    .panel {
+      padding: 22px;
+      border-radius: 24px;
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+    }
+
+    .section-title {
+      margin: 0 0 8px;
+      font-size: 1.2rem;
+      letter-spacing: 0.02em;
+    }
+
+    .section-copy,
+    .status {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .stat {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .stat-label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      display: block;
+      margin-top: 8px;
+      font-size: 1.6rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .controls {
+      display: grid;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .select,
+    .button {
+      width: 100%;
+      border: 0;
+      border-radius: 16px;
+      padding: 14px 16px;
+      font: inherit;
+    }
+
+    .select {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.92);
+      appearance: none;
+    }
+
+    .button {
+      cursor: pointer;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      transition: transform 140ms ease, box-shadow 140ms ease, opacity 140ms ease;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+    }
+
+    .button.primary {
+      color: #102432;
+      background: linear-gradient(135deg, var(--accent), #ffdca0);
+      box-shadow: 0 12px 24px rgba(243, 184, 90, 0.22);
+    }
+
+    .button.secondary {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .status {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(104, 209, 197, 0.1);
+      border: 1px solid rgba(104, 209, 197, 0.16);
+    }
+
+    .tips {
+      margin-top: 18px;
+      padding: 16px 18px;
+      border-radius: 18px;
+      color: #bdece6;
+      background: rgba(104, 209, 197, 0.08);
+      line-height: 1.55;
+    }
+
+    .board-panel {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .board-panel::before {
+      content: "";
+      position: absolute;
+      inset: auto -80px -120px auto;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(243, 184, 90, 0.22), transparent 70%);
+      pointer-events: none;
+    }
+
+    .board-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 18px;
+    }
+
+    .board-meta p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .difficulty-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 98px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      perspective: 1200px;
+    }
+
+    .card {
+      position: relative;
+      aspect-ratio: 0.9;
+      border: 0;
+      padding: 0;
+      background: transparent;
+      cursor: pointer;
+      transform-style: preserve-3d;
+    }
+
+    .card:disabled {
+      cursor: default;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 420ms cubic-bezier(0.2, 0.9, 0.2, 1), filter 180ms ease;
+    }
+
+    .card:hover .card-inner {
+      filter: brightness(1.04);
+    }
+
+    .card.is-flipped .card-inner,
+    .card.is-matched .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .face {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 10px;
+      border-radius: 22px;
+      backface-visibility: hidden;
+      box-shadow: 0 16px 26px rgba(0, 0, 0, 0.16);
+    }
+
+    .face.back {
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.22), transparent 32%),
+        linear-gradient(145deg, #f4c56d, #d45e42);
+      color: #112330;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .face.back::before {
+      content: "";
+      width: 54%;
+      height: 54%;
+      border-radius: 18px;
+      border: 2px solid rgba(17, 35, 48, 0.18);
+      background:
+        linear-gradient(135deg, rgba(17, 35, 48, 0.08), transparent),
+        repeating-linear-gradient(
+          45deg,
+          rgba(17, 35, 48, 0.1) 0 8px,
+          rgba(255, 255, 255, 0.12) 8px 16px
+        );
+    }
+
+    .face.front {
+      transform: rotateY(180deg);
+      background: var(--card-front);
+      color: var(--text-dark);
+      border: 1px solid rgba(17, 35, 48, 0.08);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: white;
+      background: linear-gradient(135deg, var(--tone-a), var(--tone-b));
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24);
+    }
+
+    .card-label {
+      margin-top: 12px;
+      font-size: 0.92rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .face-front-inner {
+      display: grid;
+      justify-items: center;
+      text-align: center;
+    }
+
+    .card.is-matched .face.front {
+      box-shadow: 0 0 0 2px rgba(135, 224, 162, 0.42), 0 16px 26px rgba(0, 0, 0, 0.12);
+    }
+
+    .card.is-matched .badge {
+      transform: scale(1.04);
+    }
+
+    @media (max-width: 920px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 680px) {
+      body {
+        padding: 16px;
+      }
+
+      .hero,
+      .panel {
+        padding: 18px;
+        border-radius: 24px;
+      }
+
+      .board {
+        gap: 10px;
+      }
+
+      .face {
+        border-radius: 18px;
+      }
+
+      .badge {
+        width: 52px;
+        height: 52px;
+        border-radius: 15px;
+        font-size: 1rem;
+      }
+
+      .card-label {
+        font-size: 0.76rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="eyebrow">Browser Game</div>
+      <h1>Memory Match</h1>
+      <p class="intro">
+        Flip, remember, and clear the board as efficiently as you can. This game is a full single-page app with
+        responsive controls, browser-only persistence, and no backend required, so it is ready for GitHub Pages.
+      </p>
+
+      <section class="layout">
+        <aside class="panel" aria-labelledby="controlTitle">
+          <h2 class="section-title" id="controlTitle">Run the round</h2>
+          <p class="section-copy">Pick a difficulty, start a new game, and chase your best move count and fastest clear time.</p>
+
+          <section class="stats" aria-label="Game stats">
+            <div class="stat">
+              <span class="stat-label">Moves</span>
+              <span class="stat-value" id="movesValue">0</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Time</span>
+              <span class="stat-value" id="timeValue">00:00</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Matches</span>
+              <span class="stat-value" id="matchesValue">0/8</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Wins</span>
+              <span class="stat-value" id="winsValue">0</span>
+            </div>
+          </section>
+
+          <div class="controls">
+            <label for="difficulty" class="stat-label">Difficulty</label>
+            <select class="select" id="difficulty">
+              <option value="easy">Easy · 6 pairs</option>
+              <option value="standard" selected>Standard · 8 pairs</option>
+              <option value="expert">Expert · 10 pairs</option>
+            </select>
+            <button class="button primary" id="newGameButton" type="button">New Round</button>
+            <button class="button secondary" id="resetStatsButton" type="button">Reset Personal Bests</button>
+          </div>
+
+          <p class="status" id="statusMessage">Find every pair with as few moves as possible.</p>
+
+          <div class="tips">
+            Best score tracking is saved in your browser with local storage, so each device keeps its own progress.
+          </div>
+        </aside>
+
+        <section class="panel board-panel" aria-labelledby="boardTitle">
+          <div class="board-meta">
+            <div>
+              <h2 class="section-title" id="boardTitle">Signal deck</h2>
+              <p>Match each symbol pair before the board runs out of surprises.</p>
+            </div>
+            <div class="difficulty-chip" id="difficultyChip">Standard</div>
+          </div>
+
+          <section class="stats" aria-label="Best scores">
+            <div class="stat">
+              <span class="stat-label">Best Moves</span>
+              <span class="stat-value" id="bestMovesValue">-</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Best Time</span>
+              <span class="stat-value" id="bestTimeValue">-</span>
+            </div>
+          </section>
+
+          <section class="board" id="board" aria-label="Memory card board"></section>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "memory-match-stats-v1";
+
+    const moveEl = document.getElementById("movesValue");
+    const timeEl = document.getElementById("timeValue");
+    const matchesEl = document.getElementById("matchesValue");
+    const winsEl = document.getElementById("winsValue");
+    const bestMovesEl = document.getElementById("bestMovesValue");
+    const bestTimeEl = document.getElementById("bestTimeValue");
+    const statusEl = document.getElementById("statusMessage");
+    const boardEl = document.getElementById("board");
+    const difficultyEl = document.getElementById("difficulty");
+    const difficultyChipEl = document.getElementById("difficultyChip");
+    const newGameButton = document.getElementById("newGameButton");
+    const resetStatsButton = document.getElementById("resetStatsButton");
+
+    const cardCatalog = [
+      { key: "nova", label: "Nova", badge: "NV", toneA: "#ff8a5b", toneB: "#ffcc74" },
+      { key: "tide", label: "Tide", badge: "TD", toneA: "#1f7bff", toneB: "#68d1c5" },
+      { key: "grove", label: "Grove", badge: "GV", toneA: "#2f9b58", toneB: "#8bd467" },
+      { key: "ember", label: "Ember", badge: "EM", toneA: "#d84b3e", toneB: "#ff9f66" },
+      { key: "quill", label: "Quill", badge: "QL", toneA: "#7057d8", toneB: "#af82ff" },
+      { key: "drift", label: "Drift", badge: "DF", toneA: "#4f6078", toneB: "#93a6bd" },
+      { key: "prism", label: "Prism", badge: "PR", toneA: "#e0529c", toneB: "#ffb0c9" },
+      { key: "forge", label: "Forge", badge: "FG", toneA: "#8c5a2d", toneB: "#f0ae63" },
+      { key: "bloom", label: "Bloom", badge: "BL", toneA: "#cc5f75", toneB: "#ffd18d" },
+      { key: "echo", label: "Echo", badge: "EC", toneA: "#14828a", toneB: "#81d9d1" }
+    ];
+
+    const difficultyConfig = {
+      easy: { pairs: 6, label: "Easy" },
+      standard: { pairs: 8, label: "Standard" },
+      expert: { pairs: 10, label: "Expert" }
+    };
+
+    let cards = [];
+    let flippedIndices = [];
+    let matchedPairs = 0;
+    let moves = 0;
+    let wins = 0;
+    let timerId = null;
+    let startTime = null;
+    let elapsedSeconds = 0;
+    let lockBoard = false;
+    let stats = loadStats();
+
+    function loadStats() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        return saved && typeof saved === "object" ? saved : {};
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function saveStats() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
+    }
+
+    function shuffle(array) {
+      const cloned = [...array];
+      for (let i = cloned.length - 1; i > 0; i -= 1) {
+        const randomIndex = Math.floor(Math.random() * (i + 1));
+        [cloned[i], cloned[randomIndex]] = [cloned[randomIndex], cloned[i]];
+      }
+      return cloned;
+    }
+
+    function getCurrentDifficulty() {
+      return difficultyEl.value in difficultyConfig ? difficultyEl.value : "standard";
+    }
+
+    function formatTime(totalSeconds) {
+      const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, "0");
+      const seconds = (totalSeconds % 60).toString().padStart(2, "0");
+      return `${minutes}:${seconds}`;
+    }
+
+    function updateStatus(message, tone) {
+      statusEl.textContent = message;
+      const palette = {
+        calm: "rgba(104, 209, 197, 0.1)",
+        success: "rgba(135, 224, 162, 0.12)",
+        alert: "rgba(255, 141, 117, 0.12)"
+      };
+      const border = {
+        calm: "rgba(104, 209, 197, 0.16)",
+        success: "rgba(135, 224, 162, 0.18)",
+        alert: "rgba(255, 141, 117, 0.18)"
+      };
+      statusEl.style.background = palette[tone] || palette.calm;
+      statusEl.style.borderColor = border[tone] || border.calm;
+    }
+
+    function updateHud() {
+      const config = difficultyConfig[getCurrentDifficulty()];
+      moveEl.textContent = moves;
+      timeEl.textContent = formatTime(elapsedSeconds);
+      matchesEl.textContent = `${matchedPairs}/${config.pairs}`;
+      winsEl.textContent = wins;
+      difficultyChipEl.textContent = config.label;
+
+      const best = stats[getCurrentDifficulty()] || {};
+      bestMovesEl.textContent = Number.isInteger(best.bestMoves) ? best.bestMoves : "-";
+      bestTimeEl.textContent = Number.isInteger(best.bestTime) ? formatTime(best.bestTime) : "-";
+    }
+
+    function buildDeck() {
+      const difficulty = getCurrentDifficulty();
+      const { pairs } = difficultyConfig[difficulty];
+      const chosen = shuffle(cardCatalog).slice(0, pairs);
+      const duplicated = chosen.flatMap((item) => [
+        { ...item, instanceId: `${item.key}-a` },
+        { ...item, instanceId: `${item.key}-b` }
+      ]);
+
+      cards = shuffle(duplicated).map((card, index) => ({
+        ...card,
+        id: `${card.instanceId}-${index}`,
+        isFlipped: false,
+        isMatched: false
+      }));
+    }
+
+    function renderBoard() {
+      boardEl.innerHTML = "";
+      const totalCards = cards.length;
+      const columns = totalCards <= 12 ? 4 : 5;
+      boardEl.style.gridTemplateColumns = `repeat(${columns}, minmax(0, 1fr))`;
+
+      cards.forEach((card, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "card";
+        button.dataset.index = index;
+        button.disabled = card.isMatched || lockBoard;
+        button.setAttribute("aria-label", card.isFlipped || card.isMatched ? `${card.label} card` : "Hidden card");
+        button.setAttribute("aria-pressed", card.isFlipped || card.isMatched ? "true" : "false");
+
+        if (card.isFlipped) {
+          button.classList.add("is-flipped");
+        }
+
+        if (card.isMatched) {
+          button.classList.add("is-matched");
+        }
+
+        button.innerHTML = `
+          <span class="card-inner">
+            <span class="face back" aria-hidden="true"></span>
+            <span class="face front">
+              <span class="face-front-inner">
+                <span class="badge" style="--tone-a:${card.toneA};--tone-b:${card.toneB};">${card.badge}</span>
+                <span class="card-label">${card.label}</span>
+              </span>
+            </span>
+          </span>
+        `;
+
+        button.addEventListener("click", () => handleCardClick(index));
+        boardEl.appendChild(button);
+      });
+    }
+
+    function startTimerIfNeeded() {
+      if (timerId || startTime !== null) {
+        return;
+      }
+
+      startTime = Date.now() - elapsedSeconds * 1000;
+      timerId = window.setInterval(() => {
+        elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+        updateHud();
+      }, 1000);
+    }
+
+    function stopTimer() {
+      if (timerId) {
+        window.clearInterval(timerId);
+      }
+      timerId = null;
+      startTime = null;
+    }
+
+    function resetRound() {
+      stopTimer();
+      flippedIndices = [];
+      matchedPairs = 0;
+      moves = 0;
+      elapsedSeconds = 0;
+      lockBoard = false;
+      buildDeck();
+      updateStatus("Find every pair with as few moves as possible.", "calm");
+      updateHud();
+      renderBoard();
+    }
+
+    function persistWin() {
+      const difficulty = getCurrentDifficulty();
+      const existing = stats[difficulty] || {};
+      const next = { ...existing };
+
+      if (!Number.isInteger(next.bestMoves) || moves < next.bestMoves) {
+        next.bestMoves = moves;
+      }
+
+      if (!Number.isInteger(next.bestTime) || elapsedSeconds < next.bestTime) {
+        next.bestTime = elapsedSeconds;
+      }
+
+      next.wins = (next.wins || 0) + 1;
+      stats[difficulty] = next;
+      wins = next.wins;
+      saveStats();
+    }
+
+    function finishGame() {
+      stopTimer();
+      persistWin();
+      updateHud();
+      updateStatus(`Board cleared in ${moves} moves and ${formatTime(elapsedSeconds)}.`, "success");
+      renderBoard();
+    }
+
+    function handleMismatch() {
+      lockBoard = true;
+      updateStatus("Not a match. Take another look before the cards flip back.", "alert");
+
+      window.setTimeout(() => {
+        flippedIndices.forEach((index) => {
+          cards[index].isFlipped = false;
+        });
+        flippedIndices = [];
+        lockBoard = false;
+        updateStatus("Keep going. You are building the map now.", "calm");
+        renderBoard();
+      }, 850);
+    }
+
+    function handleMatch() {
+      flippedIndices.forEach((index) => {
+        cards[index].isMatched = true;
+      });
+      flippedIndices = [];
+      matchedPairs += 1;
+
+      if (matchedPairs === difficultyConfig[getCurrentDifficulty()].pairs) {
+        finishGame();
+      } else {
+        updateStatus("Pair locked in. Keep the streak moving.", "success");
+        updateHud();
+        renderBoard();
+      }
+    }
+
+    function handleCardClick(index) {
+      const card = cards[index];
+
+      if (!card || card.isMatched || card.isFlipped || lockBoard || flippedIndices.length >= 2) {
+        return;
+      }
+
+      startTimerIfNeeded();
+      card.isFlipped = true;
+      flippedIndices.push(index);
+      renderBoard();
+
+      if (flippedIndices.length < 2) {
+        updateStatus("One card open. Find its twin.", "calm");
+        return;
+      }
+
+      moves += 1;
+      updateHud();
+
+      const [firstIndex, secondIndex] = flippedIndices;
+      if (cards[firstIndex].key === cards[secondIndex].key) {
+        handleMatch();
+      } else {
+        handleMismatch();
+      }
+    }
+
+    newGameButton.addEventListener("click", resetRound);
+
+    difficultyEl.addEventListener("change", () => {
+      const current = stats[getCurrentDifficulty()] || {};
+      wins = current.wins || 0;
+      resetRound();
+    });
+
+    resetStatsButton.addEventListener("click", () => {
+      stats = {};
+      saveStats();
+      wins = 0;
+      updateHud();
+      updateStatus("Saved personal bests cleared for every difficulty.", "alert");
+    });
+
+    wins = (stats[getCurrentDifficulty()] || {}).wins || 0;
+    resetRound();
+  </script>
+</body>
+</html>
