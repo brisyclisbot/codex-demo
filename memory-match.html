@@ -275,6 +275,7 @@
 
     .card-inner {
       position: relative;
+      display: block;
       width: 100%;
       height: 100%;
       transition: filter 180ms ease;
@@ -340,8 +341,10 @@
     .face-front-inner {
       display: grid;
       justify-items: center;
+      align-content: center;
       text-align: center;
       width: 100%;
+      height: 100%;
       gap: 6px;
     }
 
@@ -656,15 +659,15 @@
         }
 
         button.innerHTML = `
-          <span class="card-inner">
-            <span class="face back" aria-hidden="true"></span>
-            <span class="face front">
-              <span class="face-front-inner">
+          <div class="card-inner">
+            <div class="face back" aria-hidden="true"></div>
+            <div class="face front">
+              <div class="face-front-inner">
                 ${renderArt(card)}
                 <span class="card-label">${card.label}</span>
-              </span>
-            </span>
-          </span>
+              </div>
+            </div>
+          </div>
         `;
 
         button.addEventListener("click", () => handleCardClick(index));
