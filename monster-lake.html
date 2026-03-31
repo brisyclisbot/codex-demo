@@ -163,14 +163,22 @@
       height: 100%;
     }
 
+    .modal-root {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      pointer-events: none;
+    }
+
     .overlay {
-      position: absolute;
+      position: fixed;
       inset: 0;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 18px;
-      background: linear-gradient(180deg, rgba(31, 34, 40, 0.18), rgba(31, 34, 40, 0.4));
+      background: linear-gradient(180deg, rgba(31, 34, 40, 0.22), rgba(31, 34, 40, 0.48));
+      pointer-events: auto;
       transition: opacity 180ms ease;
     }
 
@@ -181,6 +189,8 @@
     .overlay-card {
       width: min(100%, 440px);
       padding: 18px;
+      max-height: min(82vh, 720px);
+      overflow-y: auto;
       border-radius: 24px;
       border: 2px solid rgba(111, 81, 42, 0.24);
       background:
@@ -442,6 +452,24 @@
         padding: 26px 24px;
       }
     }
+
+    @media (max-width: 560px) {
+      .overlay {
+        padding: 14px;
+        align-items: flex-end;
+      }
+
+      .overlay-card {
+        width: 100%;
+        padding: 16px;
+        border-radius: 24px 24px 18px 18px;
+        max-height: min(78vh, 680px);
+      }
+
+      .overlay-card h2 {
+        font-size: 1.6rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -456,42 +484,6 @@
       <section class="board-shell">
         <div class="game-frame" id="gameFrame" aria-label="Little Monster Lake game area">
           <canvas id="lakeCanvas" width="900" height="900"></canvas>
-
-          <div class="overlay" id="startOverlay">
-            <div class="overlay-card">
-              <h2>小船準備好了<br>Boat Ready</h2>
-              <p>滑動開船，繞開小妖，抓準空檔衝向岸邊。 Ready for one more try?</p>
-              <div class="overlay-actions">
-                <button class="button gold" id="startButton">立即開始 / Start Now</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="overlay" id="tutorialOverlay" hidden>
-            <div class="overlay-card">
-              <h2>三步上手<br>Quick Tutorial</h2>
-              <p>短短幾秒就能懂。 No long reading.</p>
-              <div class="mini-list">
-                <span>1. 拖曳湖面移動小船 / Drag anywhere on the lake</span>
-                <span>2. 別讓小妖守到你 / Keep away from the monster</span>
-                <span>3. 抵達安全岸點就逃出 / Reach shore where it is not</span>
-              </div>
-              <div class="overlay-actions">
-                <button class="button gold" id="tutorialGoButton">開始試試 / Let’s Go</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="overlay" id="resultOverlay" hidden>
-            <div class="overlay-card">
-              <h2 id="resultTitle">逃出成功<br>Escaped!</h2>
-              <p id="resultSummary">你找到缺口了。 You found an opening.</p>
-              <div class="mini-list" id="resultDetails"></div>
-              <div class="overlay-actions">
-                <button class="button gold" id="playAgainButton">再玩一次 / Play Again</button>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -571,6 +563,44 @@
 
     <p class="footer">Static single-page game for GitHub Pages. No backend, no login, no extra build step.</p>
   </main>
+
+  <div class="modal-root" aria-live="polite">
+    <div class="overlay" id="startOverlay">
+      <div class="overlay-card">
+        <h2>小船準備好了<br>Boat Ready</h2>
+        <p>滑動開船，繞開小妖，抓準空檔衝向岸邊。 Ready for one more try?</p>
+        <div class="overlay-actions">
+          <button class="button gold" id="startButton">立即開始 / Start Now</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay" id="tutorialOverlay" hidden>
+      <div class="overlay-card">
+        <h2>三步上手<br>Quick Tutorial</h2>
+        <p>短短幾秒就能懂。 No long reading.</p>
+        <div class="mini-list">
+          <span>1. 拖曳湖面移動小船 / Drag anywhere on the lake</span>
+          <span>2. 別讓小妖守到你 / Keep away from the monster</span>
+          <span>3. 抵達安全岸點就逃出 / Reach shore where it is not</span>
+        </div>
+        <div class="overlay-actions">
+          <button class="button gold" id="tutorialGoButton">開始試試 / Let’s Go</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay" id="resultOverlay" hidden>
+      <div class="overlay-card">
+        <h2 id="resultTitle">逃出成功<br>Escaped!</h2>
+        <p id="resultSummary">你找到缺口了。 You found an opening.</p>
+        <div class="mini-list" id="resultDetails"></div>
+        <div class="overlay-actions">
+          <button class="button gold" id="playAgainButton">再玩一次 / Play Again</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
     const canvas = document.getElementById("lakeCanvas");
