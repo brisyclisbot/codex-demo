@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>如何逃離小妖湖 | Escape the Little Monster Lake</title>
+  <style>
+    :root {
+      --page: linear-gradient(180deg, #f4ead1 0%, #ead6ad 42%, #9bc1c2 100%);
+      --ink: #2d2217;
+      --muted: #6c5c48;
+      --gold: #c38938;
+      --gold-deep: #8f5f1f;
+      --parchment: #f7edcf;
+      --parchment-strong: #fff7de;
+      --parchment-line: rgba(91, 66, 34, 0.22);
+      --lake-deep: #1f6c99;
+      --lake-mid: #3b9ed8;
+      --lake-light: #98d6ff;
+      --grass: #749a40;
+      --grass-light: #a8ca63;
+      --danger: #b6493e;
+      --success: #3f7f4b;
+      --shadow: 0 18px 40px rgba(73, 46, 13, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+    }
+
+    body {
+      font-family: "Trebuchet MS", "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 15% 10%, rgba(255, 248, 223, 0.9), transparent 22%),
+        radial-gradient(circle at 80% 15%, rgba(255, 255, 255, 0.35), transparent 20%),
+        var(--page);
+    }
+
+    .page {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: 18px 14px 26px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 22px 18px;
+      border: 2px solid rgba(111, 81, 42, 0.24);
+      border-radius: 28px;
+      background:
+        linear-gradient(180deg, rgba(255, 247, 219, 0.98), rgba(244, 229, 188, 0.94)),
+        var(--parchment);
+      box-shadow: var(--shadow);
+    }
+
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .hero::before {
+      top: -52px;
+      right: -42px;
+      width: 180px;
+      height: 180px;
+      background: radial-gradient(circle, rgba(195, 137, 56, 0.18), transparent 72%);
+    }
+
+    .hero::after {
+      bottom: -78px;
+      left: -38px;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(78, 144, 94, 0.18), transparent 74%);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(143, 95, 31, 0.1);
+      color: var(--gold-deep);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 14px 0 6px;
+      font-size: clamp(2.1rem, 8vw, 4.4rem);
+      line-height: 0.95;
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(0.98rem, 3vw, 1.15rem);
+      line-height: 1.45;
+    }
+
+    .layout {
+      display: grid;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .board-shell,
+    .panel {
+      border: 2px solid rgba(111, 81, 42, 0.2);
+      border-radius: 26px;
+      background:
+        linear-gradient(180deg, rgba(255, 248, 227, 0.96), rgba(244, 229, 193, 0.95)),
+        var(--parchment);
+      box-shadow: var(--shadow);
+    }
+
+    .board-shell {
+      position: relative;
+      overflow: hidden;
+      padding: 12px;
+    }
+
+    .board-shell::before {
+      content: "";
+      position: absolute;
+      inset: 10px;
+      border-radius: 22px;
+      border: 1px dashed rgba(111, 81, 42, 0.14);
+      pointer-events: none;
+    }
+
+    .game-frame {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      width: 100%;
+      border-radius: 22px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.28), transparent 28%),
+        linear-gradient(180deg, #cdeecf 0%, #97be70 100%);
+      touch-action: none;
+      user-select: none;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: linear-gradient(180deg, rgba(31, 34, 40, 0.18), rgba(31, 34, 40, 0.4));
+      transition: opacity 180ms ease;
+    }
+
+    .overlay[hidden] {
+      display: none;
+    }
+
+    .overlay-card {
+      width: min(100%, 440px);
+      padding: 18px;
+      border-radius: 24px;
+      border: 2px solid rgba(111, 81, 42, 0.24);
+      background:
+        linear-gradient(180deg, rgba(255, 248, 228, 0.98), rgba(246, 232, 198, 0.96)),
+        var(--parchment);
+      box-shadow: 0 20px 36px rgba(43, 29, 12, 0.2);
+      text-align: center;
+    }
+
+    .overlay-card h2 {
+      margin: 0 0 10px;
+      font-size: clamp(1.45rem, 6vw, 2.1rem);
+      line-height: 1.05;
+    }
+
+    .overlay-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .mini-list {
+      display: grid;
+      gap: 8px;
+      margin: 14px 0 0;
+      text-align: left;
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .mini-list span {
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.46);
+      border: 1px solid rgba(111, 81, 42, 0.12);
+    }
+
+    .overlay-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .sidebar {
+      display: grid;
+      gap: 14px;
+    }
+
+    .panel {
+      padding: 16px;
+    }
+
+    .panel h3 {
+      margin: 0 0 6px;
+      font-size: 1.05rem;
+    }
+
+    .panel p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .stat {
+      padding: 12px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.42);
+      border: 1px solid rgba(111, 81, 42, 0.12);
+    }
+
+    .stat-label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      display: block;
+      margin-top: 8px;
+      font-size: 1.25rem;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .controls {
+      display: grid;
+      gap: 14px;
+      margin-top: 12px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field label {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      font-weight: 800;
+    }
+
+    .hint-text {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .range-wrap {
+      display: grid;
+      gap: 6px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--gold-deep);
+    }
+
+    select,
+    button {
+      font: inherit;
+    }
+
+    select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid rgba(111, 81, 42, 0.18);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.82);
+      color: var(--ink);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .button {
+      flex: 1 1 150px;
+      min-height: 48px;
+      padding: 13px 18px;
+      border: 0;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 800;
+      transition: transform 140ms ease, opacity 140ms ease, box-shadow 140ms ease;
+    }
+
+    .button:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
+
+    .button:disabled {
+      opacity: 0.58;
+      cursor: default;
+    }
+
+    .button.primary {
+      color: #fffdf8;
+      background: linear-gradient(135deg, #2d5e7d, #1d80a5);
+      box-shadow: 0 12px 22px rgba(29, 128, 165, 0.22);
+    }
+
+    .button.secondary {
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.66);
+      border: 1px solid rgba(111, 81, 42, 0.12);
+    }
+
+    .button.gold {
+      color: #402611;
+      background: linear-gradient(135deg, #efc56f, #d99f49);
+      box-shadow: 0 10px 22px rgba(180, 121, 42, 0.2);
+    }
+
+    .status-banner {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(61, 125, 75, 0.1);
+      border: 1px solid rgba(61, 125, 75, 0.16);
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .status-banner.loss {
+      background: rgba(182, 73, 62, 0.09);
+      border-color: rgba(182, 73, 62, 0.16);
+    }
+
+    .chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .chip {
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(111, 81, 42, 0.11);
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    .legend {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .swatch {
+      width: 22px;
+      height: 10px;
+      border-radius: 999px;
+    }
+
+    .footer {
+      margin-top: 12px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.88rem;
+      line-height: 1.4;
+    }
+
+    @media (min-width: 940px) {
+      .page {
+        padding: 24px 18px 34px;
+      }
+
+      .layout {
+        grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.58fr);
+        align-items: start;
+      }
+
+      .hero {
+        padding: 26px 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <span class="eyebrow">Puzzle Game · 雙語遊戲</span>
+      <h1>如何逃離小妖湖</h1>
+      <p class="subtitle">Escape the Little Monster Lake. Drag the little boat, dodge the cute monster, and slip onto shore at the perfect moment.</p>
+    </section>
+
+    <section class="layout">
+      <section class="board-shell">
+        <div class="game-frame" id="gameFrame" aria-label="Little Monster Lake game area">
+          <canvas id="lakeCanvas" width="900" height="900"></canvas>
+
+          <div class="overlay" id="startOverlay">
+            <div class="overlay-card">
+              <h2>小船準備好了<br>Boat Ready</h2>
+              <p>滑動開船，繞開小妖，抓準空檔衝向岸邊。 Ready for one more try?</p>
+              <div class="overlay-actions">
+                <button class="button gold" id="startButton">立即開始 / Start Now</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="overlay" id="tutorialOverlay" hidden>
+            <div class="overlay-card">
+              <h2>三步上手<br>Quick Tutorial</h2>
+              <p>短短幾秒就能懂。 No long reading.</p>
+              <div class="mini-list">
+                <span>1. 拖曳湖面移動小船 / Drag anywhere on the lake</span>
+                <span>2. 別讓小妖守到你 / Keep away from the monster</span>
+                <span>3. 抵達安全岸點就逃出 / Reach shore where it is not</span>
+              </div>
+              <div class="overlay-actions">
+                <button class="button gold" id="tutorialGoButton">開始試試 / Let’s Go</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="overlay" id="resultOverlay" hidden>
+            <div class="overlay-card">
+              <h2 id="resultTitle">逃出成功<br>Escaped!</h2>
+              <p id="resultSummary">你找到缺口了。 You found an opening.</p>
+              <div class="mini-list" id="resultDetails"></div>
+              <div class="overlay-actions">
+                <button class="button gold" id="playAgainButton">再玩一次 / Play Again</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="sidebar">
+        <section class="panel">
+          <h3>遊戲狀態 / Run</h3>
+          <div class="stats" aria-label="Game stats">
+            <div class="stat">
+              <span class="stat-label">Timer</span>
+              <span class="stat-value" id="timerValue">0.0s</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Monster</span>
+              <span class="stat-value" id="speedValue">1.6×</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Best Escape</span>
+              <span class="stat-value" id="bestValue">-</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">State</span>
+              <span class="stat-value" id="stateValue">Ready</span>
+            </div>
+          </div>
+
+          <div class="status-banner" id="statusBanner">
+            拖曳整個湖面就能控制小船。 Drag anywhere on the lake to steer.
+          </div>
+
+          <div class="legend" aria-label="Trajectory legend">
+            <div class="legend-row"><span class="swatch" style="background:#f0f7ff;border:1px solid rgba(45,34,23,0.14);"></span> 小船軌跡 / Boat trail</div>
+            <div class="legend-row"><span class="swatch" style="background:#ff9c75;"></span> 小妖軌跡 / Monster trail</div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h3>設定 / Settings</h3>
+          <p>保持簡單，方便重玩。 Tweak a little, then jump back in.</p>
+
+          <div class="controls">
+            <div class="field">
+              <label for="difficultySelect">
+                <span>難度 / Difficulty</span>
+              </label>
+              <select id="difficultySelect">
+                <option value="gentle">輕鬆 / Gentle</option>
+                <option value="classic" selected>經典 / Classic</option>
+                <option value="tricky">狡猾 / Tricky</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="speedSlider">
+                <span>小妖速度 / Monster Speed</span>
+                <span class="hint-text" id="speedHint">1.6×</span>
+              </label>
+              <div class="range-wrap">
+                <input id="speedSlider" type="range" min="1.2" max="2.4" step="0.1" value="1.6">
+                <span class="hint-text">高一點更刺激，但別太誇張。 Slightly faster, not absurd.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="button primary" id="settingsStartButton">開始 / Start</button>
+            <button class="button secondary" id="resetButton">重置 / Reset</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h3>跑完後才揭曉 / After Your Run</h3>
+          <p id="afterRunText">先試一回，再看最佳方法提示與小小謎題說明。 Play once to reveal the hint and the puzzle idea.</p>
+          <div class="chips" id="afterRunChips"></div>
+        </section>
+      </aside>
+    </section>
+
+    <p class="footer">Static single-page game for GitHub Pages. No backend, no login, no extra build step.</p>
+  </main>
+
+  <script>
+    const canvas = document.getElementById("lakeCanvas");
+    const ctx = canvas.getContext("2d");
+    const gameFrame = document.getElementById("gameFrame");
+    const startOverlay = document.getElementById("startOverlay");
+    const tutorialOverlay = document.getElementById("tutorialOverlay");
+    const resultOverlay = document.getElementById("resultOverlay");
+    const startButton = document.getElementById("startButton");
+    const tutorialGoButton = document.getElementById("tutorialGoButton");
+    const playAgainButton = document.getElementById("playAgainButton");
+    const settingsStartButton = document.getElementById("settingsStartButton");
+    const resetButton = document.getElementById("resetButton");
+    const speedSlider = document.getElementById("speedSlider");
+    const speedHint = document.getElementById("speedHint");
+    const difficultySelect = document.getElementById("difficultySelect");
+    const timerValue = document.getElementById("timerValue");
+    const speedValue = document.getElementById("speedValue");
+    const bestValue = document.getElementById("bestValue");
+    const stateValue = document.getElementById("stateValue");
+    const statusBanner = document.getElementById("statusBanner");
+    const resultTitle = document.getElementById("resultTitle");
+    const resultSummary = document.getElementById("resultSummary");
+    const resultDetails = document.getElementById("resultDetails");
+    const afterRunText = document.getElementById("afterRunText");
+    const afterRunChips = document.getElementById("afterRunChips");
+
+    const storageKeys = {
+      best: "little-monster-lake-best",
+      tutorial: "little-monster-lake-seen-tutorial"
+    };
+
+    const difficulties = {
+      gentle: {
+        label: "Gentle",
+        boatSpeed: 0.6,
+        catchArc: 0.2,
+        accel: 5.5
+      },
+      classic: {
+        label: "Classic",
+        boatSpeed: 0.56,
+        catchArc: 0.16,
+        accel: 6.2
+      },
+      tricky: {
+        label: "Tricky",
+        boatSpeed: 0.53,
+        catchArc: 0.135,
+        accel: 7
+      }
+    };
+
+    const lake = {
+      radius: 1,
+      pointerLimit: 1.08,
+      escapeThreshold: 0.975
+    };
+
+    const state = {
+      mode: "idle",
+      result: null,
+      timer: 0,
+      bestRecord: loadBestRecord(),
+      pointerActive: false,
+      pointer: { x: 0, y: 0 },
+      lastTimestamp: 0,
+      rippleTime: 0,
+      settings: {
+        difficulty: difficultySelect.value,
+        monsterMultiplier: parseFloat(speedSlider.value)
+      },
+      boat: {
+        x: 0,
+        y: 0,
+        vx: 0,
+        vy: 0,
+        trail: []
+      },
+      monster: {
+        angle: Math.PI / 2,
+        trail: []
+      }
+    };
+
+    function loadBestRecord() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(storageKeys.best) || "null");
+        if (parsed && typeof parsed.time === "number") {
+          return parsed;
+        }
+      } catch (error) {
+        return null;
+      }
+      return null;
+    }
+
+    function saveBestRecord(record) {
+      state.bestRecord = record;
+      localStorage.setItem(storageKeys.best, JSON.stringify(record));
+    }
+
+    function hasSeenTutorial() {
+      return localStorage.getItem(storageKeys.tutorial) === "1";
+    }
+
+    function markTutorialSeen() {
+      localStorage.setItem(storageKeys.tutorial, "1");
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function lengthOf(x, y) {
+      return Math.hypot(x, y);
+    }
+
+    function normalizeAngle(angle) {
+      let result = angle;
+      while (result <= -Math.PI) {
+        result += Math.PI * 2;
+      }
+      while (result > Math.PI) {
+        result -= Math.PI * 2;
+      }
+      return result;
+    }
+
+    function formatTime(value) {
+      return `${value.toFixed(1)}s`;
+    }
+
+    function updateSpeedLabel() {
+      const value = parseFloat(speedSlider.value).toFixed(1);
+      speedHint.textContent = `${value}×`;
+      speedValue.textContent = `${value}×`;
+    }
+
+    function updateBestLabel() {
+      if (!state.bestRecord) {
+        bestValue.textContent = "-";
+        return;
+      }
+      bestValue.textContent = `${formatTime(state.bestRecord.time)} · ${state.bestRecord.multiplier.toFixed(1)}×`;
+    }
+
+    function updateStateText() {
+      const labels = {
+        idle: "Ready",
+        tutorial: "Learn",
+        running: "Running",
+        escaped: "Escaped",
+        caught: "Caught"
+      };
+      stateValue.textContent = labels[state.mode] || "Ready";
+    }
+
+    function setStatus(message, isLoss = false) {
+      statusBanner.textContent = message;
+      statusBanner.classList.toggle("loss", isLoss);
+    }
+
+    function setControlsDisabled(disabled) {
+      difficultySelect.disabled = disabled;
+      speedSlider.disabled = disabled;
+    }
+
+    function resetEntities() {
+      state.timer = 0;
+      state.result = null;
+      state.pointerActive = false;
+      state.boat.x = 0;
+      state.boat.y = 0;
+      state.boat.vx = 0;
+      state.boat.vy = 0;
+      state.boat.trail = [{ x: 0, y: 0 }];
+      state.monster.angle = Math.PI / 2;
+      state.monster.trail = [{ angle: state.monster.angle }];
+      timerValue.textContent = formatTime(0);
+      resultOverlay.hidden = true;
+    }
+
+    function applySettings() {
+      state.settings.difficulty = difficultySelect.value;
+      state.settings.monsterMultiplier = parseFloat(speedSlider.value);
+      updateSpeedLabel();
+      updateBestLabel();
+    }
+
+    function startRun() {
+      applySettings();
+      resetEntities();
+      setControlsDisabled(true);
+      startOverlay.hidden = true;
+      tutorialOverlay.hidden = true;
+      resultOverlay.hidden = true;
+      state.mode = "running";
+      updateStateText();
+      setStatus("拖曳湖面移動小船。拉遠、繞圈、再找空位衝刺。 Drag to move, circle out, then burst for shore.");
+    }
+
+    function backToIdle() {
+      resetEntities();
+      setControlsDisabled(false);
+      state.mode = "idle";
+      updateStateText();
+      setStatus("拖曳整個湖面就能控制小船。 Drag anywhere on the lake to steer.");
+      startOverlay.hidden = false;
+      tutorialOverlay.hidden = true;
+      resultOverlay.hidden = true;
+    }
+
+    function showTutorialOrStart() {
+      applySettings();
+      if (hasSeenTutorial()) {
+        startRun();
+        return;
+      }
+      startOverlay.hidden = true;
+      tutorialOverlay.hidden = false;
+      state.mode = "tutorial";
+      updateStateText();
+      setStatus("教學很短，幾秒後就能開船。 Tiny tutorial, then you are in.");
+    }
+
+    function finishRun(result) {
+      state.mode = result;
+      updateStateText();
+      setControlsDisabled(false);
+
+      const escaped = result === "escaped";
+      const currentTime = state.timer;
+      const multiplier = state.settings.monsterMultiplier;
+
+      if (escaped) {
+        setStatus("你抓到空檔了。先在湖心拉開角度，再突然直衝岸邊通常更有機會。 You found the gap.", false);
+      } else {
+        setStatus("小妖守到了岸邊。試著先在內圈拖出角度，再挑一瞬間衝刺。 The monster was waiting there.", true);
+      }
+
+      if (escaped && (!state.bestRecord || currentTime < state.bestRecord.time)) {
+        saveBestRecord({ time: currentTime, multiplier, difficulty: state.settings.difficulty });
+      }
+
+      updateBestLabel();
+
+      resultTitle.innerHTML = escaped ? "成功逃離<br>Escaped!" : "被小妖守住了<br>Caught!";
+      resultSummary.textContent = escaped
+        ? "你在岸邊找到缺口，漂亮脫逃。 You slipped onto shore at the right moment."
+        : "差一點。小妖比你快，但不一定每次都能守到。 So close. Faster, but not unbeatable.";
+
+      const details = [
+        `${escaped ? "用時" : "堅持"} / Time: ${formatTime(currentTime)}`,
+        `小妖倍率 / Monster: ${multiplier.toFixed(1)}×`,
+        state.bestRecord ? `最佳紀錄 / Best: ${formatTime(state.bestRecord.time)}` : "最佳紀錄 / Best: 尚未建立 / None yet"
+      ];
+
+      resultDetails.innerHTML = details.map((item) => `<span>${item}</span>`).join("");
+      resultOverlay.hidden = false;
+
+      const hint = escaped
+        ? "最佳方法提示：先別急著衝岸。留在中心附近，慢慢把小妖角度拉到一側，再突然走直線。 Best hint: delay the dash, create angle first, then burst."
+        : "最佳方法提示：一直直衝通常會被守到。先在中心附近拖動，逼小妖跟著轉，再抓空隙往外切。 Best hint: don’t sprint straight away. Make it chase the wrong angle first.";
+
+      const concept = "小謎題概念：岸邊那圈很長，小妖雖然更快，但它得沿著圓周追你。你若先在湖內控制角度，再選對時機往外衝，就可能在不同位置先到岸。 Concept: the monster is faster, but it must travel around the rim. Angle matters.";
+
+      afterRunText.textContent = `${hint} ${concept}`;
+      afterRunChips.innerHTML = [
+        `<span class="chip">${escaped ? "逃出成功 / Escape" : "再試一次 / Try Again"}</span>`,
+        `<span class="chip">角度比直衝更重要 / Angle beats panic</span>`,
+        `<span class="chip">倍率 ${multiplier.toFixed(1)}× / Speed ${multiplier.toFixed(1)}×</span>`
+      ].join("");
+    }
+
+    function screenToWorld(clientX, clientY) {
+      const rect = canvas.getBoundingClientRect();
+      const size = Math.min(rect.width, rect.height);
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const x = (clientX - centerX) / (size * 0.44);
+      const y = (clientY - centerY) / (size * 0.44);
+      const distance = lengthOf(x, y);
+
+      if (distance <= lake.pointerLimit) {
+        return { x, y };
+      }
+
+      const scale = lake.pointerLimit / distance;
+      return { x: x * scale, y: y * scale };
+    }
+
+    function storeTrails() {
+      const boatTrail = state.boat.trail;
+      const monsterTrail = state.monster.trail;
+      const lastBoat = boatTrail[boatTrail.length - 1];
+      const lastMonster = monsterTrail[monsterTrail.length - 1];
+
+      if (!lastBoat || lengthOf(state.boat.x - lastBoat.x, state.boat.y - lastBoat.y) > 0.012) {
+        boatTrail.push({ x: state.boat.x, y: state.boat.y });
+      }
+
+      if (!lastMonster || Math.abs(normalizeAngle(state.monster.angle - lastMonster.angle)) > 0.025) {
+        monsterTrail.push({ angle: state.monster.angle });
+      }
+
+      if (boatTrail.length > 180) {
+        boatTrail.shift();
+      }
+
+      if (monsterTrail.length > 220) {
+        monsterTrail.shift();
+      }
+    }
+
+    function updateSimulation(dt) {
+      if (state.mode !== "running") {
+        return;
+      }
+
+      state.timer += dt;
+      timerValue.textContent = formatTime(state.timer);
+
+      const difficulty = difficulties[state.settings.difficulty];
+      const boat = state.boat;
+      const monster = state.monster;
+      const boatSpeed = difficulty.boatSpeed;
+
+      let desiredVx = 0;
+      let desiredVy = 0;
+
+      if (state.pointerActive) {
+        const dx = state.pointer.x - boat.x;
+        const dy = state.pointer.y - boat.y;
+        const distance = lengthOf(dx, dy);
+
+        if (distance > 0.01) {
+          const gain = Math.min(1, distance / 0.26);
+          desiredVx = (dx / distance) * boatSpeed * gain;
+          desiredVy = (dy / distance) * boatSpeed * gain;
+        }
+      }
+
+      const ease = 1 - Math.exp(-difficulty.accel * dt);
+      boat.vx += (desiredVx - boat.vx) * ease;
+      boat.vy += (desiredVy - boat.vy) * ease;
+      boat.x += boat.vx * dt;
+      boat.y += boat.vy * dt;
+
+      const radial = lengthOf(boat.x, boat.y);
+      if (radial > lake.escapeThreshold) {
+        const scale = lake.escapeThreshold / radial;
+        boat.x *= scale;
+        boat.y *= scale;
+      }
+
+      const playerAngle = Math.atan2(boat.y, boat.x);
+      const targetDelta = normalizeAngle(playerAngle - monster.angle);
+      const maxAngular = (boatSpeed * state.settings.monsterMultiplier / lake.radius) * dt;
+      const step = clamp(targetDelta, -maxAngular, maxAngular);
+      monster.angle = normalizeAngle(monster.angle + step);
+
+      storeTrails();
+
+      const boatRadius = lengthOf(boat.x, boat.y);
+      if (boatRadius >= lake.escapeThreshold) {
+        const separation = Math.abs(normalizeAngle(playerAngle - monster.angle));
+        const result = separation <= difficulty.catchArc ? "caught" : "escaped";
+        finishRun(result);
+      }
+    }
+
+    function drawTrail() {
+      const size = canvas.width;
+      const center = size / 2;
+      const scale = size * 0.44;
+
+      if (state.boat.trail.length > 1) {
+        ctx.save();
+        ctx.lineWidth = size * 0.009;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.strokeStyle = "rgba(255, 250, 240, 0.88)";
+        ctx.beginPath();
+        state.boat.trail.forEach((point, index) => {
+          const x = center + point.x * scale;
+          const y = center + point.y * scale;
+          if (index === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
+        });
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      if (state.monster.trail.length > 1) {
+        ctx.save();
+        ctx.lineWidth = size * 0.006;
+        ctx.setLineDash([size * 0.018, size * 0.016]);
+        ctx.strokeStyle = "rgba(255, 129, 88, 0.68)";
+        ctx.beginPath();
+        state.monster.trail.forEach((point, index) => {
+          const x = center + Math.cos(point.angle) * scale;
+          const y = center + Math.sin(point.angle) * scale;
+          if (index === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
+        });
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    function drawLake(now) {
+      const size = canvas.width;
+      const center = size / 2;
+      const radius = size * 0.44;
+      const shoreOuter = radius * 1.08;
+      const shoreInner = radius * 1.01;
+
+      ctx.clearRect(0, 0, size, size);
+
+      const bg = ctx.createLinearGradient(0, 0, 0, size);
+      bg.addColorStop(0, "#cfe9b4");
+      bg.addColorStop(1, "#86b264");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, size, size);
+
+      for (let i = 0; i < 16; i += 1) {
+        const angle = i * 0.39 + now * 0.00012;
+        const x = center + Math.cos(angle) * radius * 1.26;
+        const y = center + Math.sin(angle) * radius * 1.28;
+        ctx.fillStyle = i % 2 === 0 ? "rgba(69, 113, 31, 0.24)" : "rgba(109, 150, 56, 0.18)";
+        ctx.beginPath();
+        ctx.ellipse(x, y, size * 0.06, size * 0.02, angle, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      const shoreGradient = ctx.createRadialGradient(center, center, shoreInner, center, center, shoreOuter);
+      shoreGradient.addColorStop(0, "#b9d86e");
+      shoreGradient.addColorStop(0.6, "#81a946");
+      shoreGradient.addColorStop(1, "#5f7f2f");
+      ctx.fillStyle = shoreGradient;
+      ctx.beginPath();
+      ctx.arc(center, center, shoreOuter, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = "#d6b56e";
+      ctx.beginPath();
+      ctx.arc(center, center, radius * 1.01, 0, Math.PI * 2);
+      ctx.fill();
+
+      const lakeGradient = ctx.createRadialGradient(center - radius * 0.25, center - radius * 0.28, radius * 0.15, center, center, radius);
+      lakeGradient.addColorStop(0, "#b8ebff");
+      lakeGradient.addColorStop(0.38, "#5cb2e4");
+      lakeGradient.addColorStop(1, "#155f8c");
+      ctx.fillStyle = lakeGradient;
+      ctx.beginPath();
+      ctx.arc(center, center, radius, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.save();
+      ctx.globalAlpha = 0.18;
+      for (let i = 0; i < 4; i += 1) {
+        const ripple = ((now * 0.00016 + i * 0.24) % 1);
+        const rippleRadius = radius * (0.2 + ripple * 0.78);
+        ctx.strokeStyle = `rgba(255,255,255,${0.42 - ripple * 0.3})`;
+        ctx.lineWidth = size * 0.004;
+        ctx.beginPath();
+        ctx.arc(center, center, rippleRadius, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      drawTrail();
+      drawGuide();
+      drawBoat(center, radius);
+      drawMonster(center, radius);
+    }
+
+    function drawGuide() {
+      const size = canvas.width;
+      const center = size / 2;
+      const radius = size * 0.44;
+
+      if (state.mode !== "running" || !state.pointerActive) {
+        return;
+      }
+
+      ctx.save();
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
+      ctx.lineWidth = size * 0.004;
+      ctx.setLineDash([size * 0.012, size * 0.016]);
+      ctx.beginPath();
+      ctx.moveTo(center + state.boat.x * radius, center + state.boat.y * radius);
+      ctx.lineTo(center + state.pointer.x * radius, center + state.pointer.y * radius);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawBoat(center, radius) {
+      const boatX = center + state.boat.x * radius;
+      const boatY = center + state.boat.y * radius;
+      const direction = state.pointerActive
+        ? Math.atan2(state.pointer.y - state.boat.y, state.pointer.x - state.boat.x)
+        : Math.atan2(state.boat.vy, state.boat.vx) || -Math.PI / 2;
+      const hull = radius * 0.082;
+      const bob = Math.sin(performance.now() * 0.006 + state.timer * 4) * radius * 0.008;
+
+      ctx.save();
+      ctx.translate(boatX, boatY + bob);
+      ctx.rotate(direction + Math.PI / 2);
+
+      ctx.fillStyle = "rgba(255,255,255,0.18)";
+      ctx.beginPath();
+      ctx.ellipse(0, hull * 0.74, hull * 0.72, hull * 0.32, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = "#83522b";
+      ctx.beginPath();
+      ctx.moveTo(0, hull * 0.88);
+      ctx.lineTo(-hull * 0.66, 0);
+      ctx.lineTo(hull * 0.66, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = "#fff8ec";
+      ctx.beginPath();
+      ctx.moveTo(0, -hull * 0.92);
+      ctx.lineTo(0, hull * 0.18);
+      ctx.lineTo(hull * 0.62, -hull * 0.08);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.strokeStyle = "rgba(45,34,23,0.18)";
+      ctx.lineWidth = radius * 0.006;
+      ctx.beginPath();
+      ctx.moveTo(0, -hull * 0.92);
+      ctx.lineTo(0, hull * 0.3);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawMonster(center, radius) {
+      const x = center + Math.cos(state.monster.angle) * radius;
+      const y = center + Math.sin(state.monster.angle) * radius;
+      const body = radius * 0.08;
+      const bounce = Math.abs(Math.sin(performance.now() * 0.008)) * radius * 0.012;
+      const facing = state.monster.angle + Math.PI / 2;
+
+      ctx.save();
+      ctx.translate(x, y - bounce);
+      ctx.rotate(facing);
+
+      ctx.fillStyle = "#f58c66";
+      ctx.beginPath();
+      ctx.arc(0, 0, body * 0.76, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(-body * 0.45, -body * 0.4);
+      ctx.lineTo(-body * 0.1, -body * 1.1);
+      ctx.lineTo(body * 0.08, -body * 0.42);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(body * 0.45, -body * 0.4);
+      ctx.lineTo(body * 0.12, -body * 1.08);
+      ctx.lineTo(-body * 0.05, -body * 0.42);
+      ctx.fill();
+
+      ctx.fillStyle = "#fffdf8";
+      ctx.beginPath();
+      ctx.arc(-body * 0.22, -body * 0.05, body * 0.15, 0, Math.PI * 2);
+      ctx.arc(body * 0.22, -body * 0.05, body * 0.15, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = "#2d2217";
+      ctx.beginPath();
+      ctx.arc(-body * 0.22, -body * 0.05, body * 0.07, 0, Math.PI * 2);
+      ctx.arc(body * 0.22, -body * 0.05, body * 0.07, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = "#2d2217";
+      ctx.lineWidth = radius * 0.004;
+      ctx.beginPath();
+      ctx.arc(0, body * 0.14, body * 0.2, 0.15, Math.PI - 0.15);
+      ctx.stroke();
+
+      ctx.strokeStyle = "rgba(45,34,23,0.2)";
+      ctx.beginPath();
+      ctx.moveTo(-body * 0.36, body * 0.62);
+      ctx.lineTo(-body * 0.24, body * 0.98);
+      ctx.moveTo(body * 0.36, body * 0.62);
+      ctx.lineTo(body * 0.24, body * 0.98);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function render(now) {
+      if (!state.lastTimestamp) {
+        state.lastTimestamp = now;
+      }
+
+      const dt = Math.min(0.033, (now - state.lastTimestamp) / 1000);
+      state.lastTimestamp = now;
+      updateSimulation(dt);
+      drawLake(now);
+      requestAnimationFrame(render);
+    }
+
+    function handlePointerStart(event) {
+      if (state.mode !== "running") {
+        return;
+      }
+      const point = screenToWorld(event.clientX, event.clientY);
+      state.pointer = point;
+      state.pointerActive = true;
+      canvas.setPointerCapture(event.pointerId);
+    }
+
+    function handlePointerMove(event) {
+      if (!state.pointerActive || state.mode !== "running") {
+        return;
+      }
+      state.pointer = screenToWorld(event.clientX, event.clientY);
+    }
+
+    function handlePointerEnd(event) {
+      state.pointerActive = false;
+      if (canvas.hasPointerCapture(event.pointerId)) {
+        canvas.releasePointerCapture(event.pointerId);
+      }
+    }
+
+    speedSlider.addEventListener("input", () => {
+      updateSpeedLabel();
+    });
+
+    difficultySelect.addEventListener("change", () => {
+      const preset = difficultySelect.value;
+      if (preset === "gentle") {
+        speedSlider.value = "1.4";
+      } else if (preset === "classic") {
+        speedSlider.value = "1.6";
+      } else {
+        speedSlider.value = "1.9";
+      }
+      updateSpeedLabel();
+    });
+
+    startButton.addEventListener("click", showTutorialOrStart);
+    settingsStartButton.addEventListener("click", showTutorialOrStart);
+    tutorialGoButton.addEventListener("click", () => {
+      markTutorialSeen();
+      startRun();
+    });
+    playAgainButton.addEventListener("click", startRun);
+    resetButton.addEventListener("click", backToIdle);
+
+    canvas.addEventListener("pointerdown", handlePointerStart);
+    canvas.addEventListener("pointermove", handlePointerMove);
+    canvas.addEventListener("pointerup", handlePointerEnd);
+    canvas.addEventListener("pointercancel", handlePointerEnd);
+    canvas.addEventListener("pointerleave", (event) => {
+      if (event.buttons === 0) {
+        state.pointerActive = false;
+      }
+    });
+
+    updateSpeedLabel();
+    updateBestLabel();
+    updateStateText();
+    resetEntities();
+    requestAnimationFrame(render);
+  </script>
+</body>
+</html>
