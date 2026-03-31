@@ -229,7 +229,7 @@
       margin-top: 16px;
     }
 
-    .tutorial-card {
+    .helper-card {
       margin-top: 14px;
       padding: 14px;
       border-radius: 18px;
@@ -237,13 +237,20 @@
       border: 1px solid rgba(111, 81, 42, 0.12);
     }
 
-    .tutorial-card[hidden] {
+    .helper-card[hidden] {
       display: none;
     }
 
-    .tutorial-card h4 {
+    .helper-card h4 {
       margin: 0 0 6px;
       font-size: 0.98rem;
+    }
+
+    .helper-copy {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.45;
     }
 
     .sidebar {
@@ -557,27 +564,25 @@
             </div>
           </div>
 
+          <div class="helper-card" id="helperCard">
+            <h4>快速提示 / Quick Tip</h4>
+            <div class="mini-list">
+              <span>拖曳湖面控制小船 / Drag the lake to steer</span>
+              <span>先拉開角度，再衝岸 / Make angle first, then dash</span>
+              <span>碰到安全岸點就逃出 / Reach clear shore to escape</span>
+            </div>
+            <p class="helper-copy">直接開始就能玩，不用先關閉任何視窗。 Start works immediately with no extra step.</p>
+          </div>
+
           <div class="actions">
             <button class="button primary" id="settingsStartButton">立即開始 / Start Now</button>
             <button class="button secondary" id="resetButton">重置 / Reset</button>
-          </div>
-
-          <div class="tutorial-card" id="tutorialCard">
-            <h4>快速上手 / Quick How-To</h4>
-            <div class="mini-list">
-              <span>1. 拖曳湖面移動小船 / Drag anywhere on the lake</span>
-              <span>2. 別讓小妖守到你 / Keep away from the monster</span>
-              <span>3. 抵達安全岸點就逃出 / Reach shore where it is not</span>
-            </div>
-            <div class="overlay-actions">
-              <button class="button gold" id="tutorialGoButton">知道了，開始 / Got It</button>
-            </div>
           </div>
         </section>
 
         <section class="panel">
           <h3>跑完後才揭曉 / After Your Run</h3>
-          <p id="afterRunText">先試一回，再看最佳方法提示與小小謎題說明。 Play once to reveal the hint and the puzzle idea.</p>
+          <p id="afterRunText">完成一回後，這裡會顯示最佳方法提示與小小謎題說明。 Finish one run to reveal the strategy hint and puzzle idea.</p>
           <div class="chips" id="afterRunChips"></div>
         </section>
       </aside>
@@ -594,6 +599,7 @@
         <div class="mini-list" id="resultDetails"></div>
         <div class="overlay-actions">
           <button class="button gold" id="playAgainButton">再玩一次 / Play Again</button>
+          <button class="button secondary" id="closeResultButton">返回設定 / Back</button>
         </div>
       </div>
     </div>
@@ -602,11 +608,10 @@
   <script>
     const canvas = document.getElementById("lakeCanvas");
     const ctx = canvas.getContext("2d");
-    const gameFrame = document.getElementById("gameFrame");
     const resultOverlay = document.getElementById("resultOverlay");
-    const tutorialCard = document.getElementById("tutorialCard");
-    const tutorialGoButton = document.getElementById("tutorialGoButton");
+    const helperCard = document.getElementById("helperCard");
     const playAgainButton = document.getElementById("playAgainButton");
+    const closeResultButton = document.getElementById("closeResultButton");
     const settingsStartButton = document.getElementById("settingsStartButton");
     const resetButton = document.getElementById("resetButton");
     const speedSlider = document.getElementById("speedSlider");
@@ -624,8 +629,7 @@
     const afterRunChips = document.getElementById("afterRunChips");
 
     const storageKeys = {
-      best: "little-monster-lake-best",
-      tutorial: "little-monster-lake-seen-tutorial"
+      best: "little-monster-lake-best"
     };
 
     const difficulties = {
@@ -698,14 +702,6 @@
       localStorage.setItem(storageKeys.best, JSON.stringify(record));
     }
 
-    function hasSeenTutorial() {
-      return localStorage.getItem(storageKeys.tutorial) === "1";
-    }
-
-    function markTutorialSeen() {
-      localStorage.setItem(storageKeys.tutorial, "1");
-    }
-
     function clamp(value, min, max) {
       return Math.max(min, Math.min(max, value));
     }
@@ -746,7 +742,6 @@
     function updateStateText() {
       const labels = {
         idle: "Ready",
-        tutorial: "Learn",
         running: "Running",
         escaped: "Escaped",
         caught: "Caught"
@@ -790,7 +785,7 @@
       applySettings();
       resetEntities();
       setControlsDisabled(true);
-      tutorialCard.hidden = true;
+      helperCard.hidden = false;
       resultOverlay.hidden = true;
       state.mode = "running";
       updateStateText();
@@ -803,20 +798,13 @@
       state.mode = "idle";
       updateStateText();
       setStatus("拖曳整個湖面就能控制小船。 Drag anywhere on the lake to steer.");
-      tutorialCard.hidden = hasSeenTutorial();
+      helperCard.hidden = false;
       resultOverlay.hidden = true;
     }
 
     function showTutorialOrStart() {
       applySettings();
-      if (hasSeenTutorial()) {
-        startRun();
-        return;
-      }
-      state.mode = "tutorial";
-      updateStateText();
-      tutorialCard.hidden = false;
-      setStatus("先看三步提示，或直接調整倍率後開始。 Quick tip first, then start when ready.");
+      startRun();
     }
 
     function finishRun(result) {
@@ -1249,12 +1237,8 @@
     });
 
     settingsStartButton.addEventListener("click", showTutorialOrStart);
-    tutorialGoButton.addEventListener("click", () => {
-      markTutorialSeen();
-      tutorialCard.hidden = true;
-      startRun();
-    });
     playAgainButton.addEventListener("click", startRun);
+    closeResultButton.addEventListener("click", backToIdle);
     resetButton.addEventListener("click", backToIdle);
 
     canvas.addEventListener("pointerdown", handlePointerStart);
@@ -1271,7 +1255,7 @@
     updateBestLabel();
     updateStateText();
     resetEntities();
-    tutorialCard.hidden = hasSeenTutorial();
+    helperCard.hidden = false;
     requestAnimationFrame(render);
   </script>
 </body>
