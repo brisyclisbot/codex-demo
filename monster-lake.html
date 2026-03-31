@@ -119,6 +119,14 @@
       margin-top: 16px;
     }
 
+    .board-column {
+      order: 2;
+    }
+
+    .sidebar {
+      order: 1;
+    }
+
     .board-shell,
     .panel {
       border: 2px solid rgba(111, 81, 42, 0.2);
@@ -465,6 +473,14 @@
         align-items: start;
       }
 
+      .board-column {
+        order: 1;
+      }
+
+      .sidebar {
+        order: 2;
+      }
+
       .hero {
         padding: 26px 24px;
       }
@@ -498,7 +514,7 @@
     </section>
 
     <section class="layout">
-      <section class="board-shell">
+      <section class="board-shell board-column">
         <div class="game-frame" id="gameFrame" aria-label="Little Monster Lake game area">
           <canvas id="lakeCanvas" width="900" height="900"></canvas>
         </div>
