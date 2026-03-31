@@ -163,13 +163,6 @@
       height: 100%;
     }
 
-    .modal-root {
-      position: fixed;
-      inset: 0;
-      z-index: 20;
-      pointer-events: none;
-    }
-
     .overlay {
       position: fixed;
       inset: 0;
@@ -234,6 +227,23 @@
       justify-content: center;
       flex-wrap: wrap;
       margin-top: 16px;
+    }
+
+    .tutorial-card {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.44);
+      border: 1px solid rgba(111, 81, 42, 0.12);
+    }
+
+    .tutorial-card[hidden] {
+      display: none;
+    }
+
+    .tutorial-card h4 {
+      margin: 0 0 6px;
+      font-size: 0.98rem;
     }
 
     .sidebar {
@@ -548,8 +558,20 @@
           </div>
 
           <div class="actions">
-            <button class="button primary" id="settingsStartButton">開始 / Start</button>
+            <button class="button primary" id="settingsStartButton">立即開始 / Start Now</button>
             <button class="button secondary" id="resetButton">重置 / Reset</button>
+          </div>
+
+          <div class="tutorial-card" id="tutorialCard">
+            <h4>快速上手 / Quick How-To</h4>
+            <div class="mini-list">
+              <span>1. 拖曳湖面移動小船 / Drag anywhere on the lake</span>
+              <span>2. 別讓小妖守到你 / Keep away from the monster</span>
+              <span>3. 抵達安全岸點就逃出 / Reach shore where it is not</span>
+            </div>
+            <div class="overlay-actions">
+              <button class="button gold" id="tutorialGoButton">知道了，開始 / Got It</button>
+            </div>
           </div>
         </section>
 
@@ -564,32 +586,7 @@
     <p class="footer">Static single-page game for GitHub Pages. No backend, no login, no extra build step.</p>
   </main>
 
-  <div class="modal-root" aria-live="polite">
-    <div class="overlay" id="startOverlay">
-      <div class="overlay-card">
-        <h2>小船準備好了<br>Boat Ready</h2>
-        <p>滑動開船，繞開小妖，抓準空檔衝向岸邊。 Ready for one more try?</p>
-        <div class="overlay-actions">
-          <button class="button gold" id="startButton">立即開始 / Start Now</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="overlay" id="tutorialOverlay" hidden>
-      <div class="overlay-card">
-        <h2>三步上手<br>Quick Tutorial</h2>
-        <p>短短幾秒就能懂。 No long reading.</p>
-        <div class="mini-list">
-          <span>1. 拖曳湖面移動小船 / Drag anywhere on the lake</span>
-          <span>2. 別讓小妖守到你 / Keep away from the monster</span>
-          <span>3. 抵達安全岸點就逃出 / Reach shore where it is not</span>
-        </div>
-        <div class="overlay-actions">
-          <button class="button gold" id="tutorialGoButton">開始試試 / Let’s Go</button>
-        </div>
-      </div>
-    </div>
-
+  <div aria-live="polite">
     <div class="overlay" id="resultOverlay" hidden>
       <div class="overlay-card">
         <h2 id="resultTitle">逃出成功<br>Escaped!</h2>
@@ -606,10 +603,8 @@
     const canvas = document.getElementById("lakeCanvas");
     const ctx = canvas.getContext("2d");
     const gameFrame = document.getElementById("gameFrame");
-    const startOverlay = document.getElementById("startOverlay");
-    const tutorialOverlay = document.getElementById("tutorialOverlay");
     const resultOverlay = document.getElementById("resultOverlay");
-    const startButton = document.getElementById("startButton");
+    const tutorialCard = document.getElementById("tutorialCard");
     const tutorialGoButton = document.getElementById("tutorialGoButton");
     const playAgainButton = document.getElementById("playAgainButton");
     const settingsStartButton = document.getElementById("settingsStartButton");
@@ -795,8 +790,7 @@
       applySettings();
       resetEntities();
       setControlsDisabled(true);
-      startOverlay.hidden = true;
-      tutorialOverlay.hidden = true;
+      tutorialCard.hidden = true;
       resultOverlay.hidden = true;
       state.mode = "running";
       updateStateText();
@@ -809,8 +803,7 @@
       state.mode = "idle";
       updateStateText();
       setStatus("拖曳整個湖面就能控制小船。 Drag anywhere on the lake to steer.");
-      startOverlay.hidden = false;
-      tutorialOverlay.hidden = true;
+      tutorialCard.hidden = hasSeenTutorial();
       resultOverlay.hidden = true;
     }
 
@@ -820,11 +813,10 @@
         startRun();
         return;
       }
-      startOverlay.hidden = true;
-      tutorialOverlay.hidden = false;
       state.mode = "tutorial";
       updateStateText();
-      setStatus("教學很短，幾秒後就能開船。 Tiny tutorial, then you are in.");
+      tutorialCard.hidden = false;
+      setStatus("先看三步提示，或直接調整倍率後開始。 Quick tip first, then start when ready.");
     }
 
     function finishRun(result) {
@@ -1256,10 +1248,10 @@
       updateSpeedLabel();
     });
 
-    startButton.addEventListener("click", showTutorialOrStart);
     settingsStartButton.addEventListener("click", showTutorialOrStart);
     tutorialGoButton.addEventListener("click", () => {
       markTutorialSeen();
+      tutorialCard.hidden = true;
       startRun();
     });
     playAgainButton.addEventListener("click", startRun);
@@ -1279,6 +1271,7 @@
     updateBestLabel();
     updateStateText();
     resetEntities();
+    tutorialCard.hidden = hasSeenTutorial();
     requestAnimationFrame(render);
   </script>
 </body>
