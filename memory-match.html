@@ -13,6 +13,7 @@
       --card-front: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(240, 246, 250, 0.92));
       --text: #eef6fb;
       --text-dark: #132535;
+      --text-strong: #0f2231;
       --muted: rgba(238, 246, 251, 0.72);
       --line: rgba(255, 255, 255, 0.1);
       --accent: #f3b85a;
@@ -158,9 +159,14 @@
     }
 
     .select {
-      color: var(--text);
+      color: var(--text-strong);
       background: rgba(255, 255, 255, 0.92);
       appearance: none;
+    }
+
+    .select option {
+      color: var(--text-strong);
+      background: #ffffff;
     }
 
     .button {
@@ -307,17 +313,18 @@
 
     .face.back::before {
       content: "";
-      width: 54%;
-      height: 54%;
-      border-radius: 18px;
-      border: 2px solid rgba(17, 35, 48, 0.18);
+      width: 60%;
+      height: 60%;
+      border-radius: 22px;
+      border: 2px solid rgba(17, 35, 48, 0.14);
       background:
-        linear-gradient(135deg, rgba(17, 35, 48, 0.08), transparent),
-        repeating-linear-gradient(
-          45deg,
-          rgba(17, 35, 48, 0.1) 0 8px,
-          rgba(255, 255, 255, 0.12) 8px 16px
-        );
+        radial-gradient(circle at 28% 28%, rgba(255, 255, 255, 0.82), transparent 20%),
+        radial-gradient(circle at 72% 34%, rgba(255, 255, 255, 0.34), transparent 18%),
+        radial-gradient(circle at 42% 70%, rgba(17, 35, 48, 0.1), transparent 24%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(17, 35, 48, 0.08));
+      box-shadow:
+        inset 0 0 0 10px rgba(255, 255, 255, 0.08),
+        0 8px 16px rgba(17, 35, 48, 0.08);
     }
 
     .face.front {
@@ -325,21 +332,6 @@
       background: var(--card-front);
       color: var(--text-dark);
       border: 1px solid rgba(17, 35, 48, 0.08);
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 64px;
-      height: 64px;
-      border-radius: 18px;
-      font-size: 1.2rem;
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      color: white;
-      background: linear-gradient(135deg, var(--tone-a), var(--tone-b));
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24);
     }
 
     .card-label {
@@ -354,13 +346,42 @@
       display: grid;
       justify-items: center;
       text-align: center;
+      width: 100%;
+      gap: 12px;
+    }
+
+    .art {
+      display: block;
+      width: min(100%, 112px);
+      height: auto;
+      filter: drop-shadow(0 10px 16px rgba(17, 35, 48, 0.12));
+    }
+
+    .art-accent {
+      fill: var(--tone-a);
+    }
+
+    .art-accent-soft {
+      fill: var(--tone-b);
+    }
+
+    .art-ink {
+      fill: #163245;
+    }
+
+    .art-line {
+      stroke: #163245;
+      stroke-width: 7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
     }
 
     .card.is-matched .face.front {
       box-shadow: 0 0 0 2px rgba(135, 224, 162, 0.42), 0 16px 26px rgba(0, 0, 0, 0.12);
     }
 
-    .card.is-matched .badge {
+    .card.is-matched .art {
       transform: scale(1.04);
     }
 
@@ -389,11 +410,8 @@
         border-radius: 18px;
       }
 
-      .badge {
-        width: 52px;
-        height: 52px;
-        border-radius: 15px;
-        font-size: 1rem;
+      .art {
+        width: min(100%, 82px);
       }
 
       .card-label {
@@ -497,16 +515,16 @@
     const resetStatsButton = document.getElementById("resetStatsButton");
 
     const cardCatalog = [
-      { key: "nova", label: "Nova", badge: "NV", toneA: "#ff8a5b", toneB: "#ffcc74" },
-      { key: "tide", label: "Tide", badge: "TD", toneA: "#1f7bff", toneB: "#68d1c5" },
-      { key: "grove", label: "Grove", badge: "GV", toneA: "#2f9b58", toneB: "#8bd467" },
-      { key: "ember", label: "Ember", badge: "EM", toneA: "#d84b3e", toneB: "#ff9f66" },
-      { key: "quill", label: "Quill", badge: "QL", toneA: "#7057d8", toneB: "#af82ff" },
-      { key: "drift", label: "Drift", badge: "DF", toneA: "#4f6078", toneB: "#93a6bd" },
-      { key: "prism", label: "Prism", badge: "PR", toneA: "#e0529c", toneB: "#ffb0c9" },
-      { key: "forge", label: "Forge", badge: "FG", toneA: "#8c5a2d", toneB: "#f0ae63" },
-      { key: "bloom", label: "Bloom", badge: "BL", toneA: "#cc5f75", toneB: "#ffd18d" },
-      { key: "echo", label: "Echo", badge: "EC", toneA: "#14828a", toneB: "#81d9d1" }
+      { key: "sun", label: "Sun", toneA: "#ff9b54", toneB: "#ffd36e", art: "sun" },
+      { key: "moon", label: "Moon", toneA: "#6078ff", toneB: "#b7c3ff", art: "moon" },
+      { key: "leaf", label: "Leaf", toneA: "#2f9b58", toneB: "#9ee274", art: "leaf" },
+      { key: "wave", label: "Wave", toneA: "#1f7bff", toneB: "#7fe3ea", art: "wave" },
+      { key: "star", label: "Star", toneA: "#df5aa4", toneB: "#ffc171", art: "star" },
+      { key: "bolt", label: "Bolt", toneA: "#7d63f4", toneB: "#c7a5ff", art: "bolt" },
+      { key: "mountain", label: "Peak", toneA: "#54677d", toneB: "#b8c7d8", art: "mountain" },
+      { key: "flame", label: "Flame", toneA: "#dd563f", toneB: "#ffb36b", art: "flame" },
+      { key: "shell", label: "Shell", toneA: "#db6e82", toneB: "#ffd0a8", art: "shell" },
+      { key: "planet", label: "Planet", toneA: "#168189", toneB: "#8ce4d8", art: "planet" }
     ];
 
     const difficultyConfig = {
@@ -632,7 +650,7 @@
             <span class="face back" aria-hidden="true"></span>
             <span class="face front">
               <span class="face-front-inner">
-                <span class="badge" style="--tone-a:${card.toneA};--tone-b:${card.toneB};">${card.badge}</span>
+                ${renderArt(card)}
                 <span class="card-label">${card.label}</span>
               </span>
             </span>
@@ -642,6 +660,84 @@
         button.addEventListener("click", () => handleCardClick(index));
         boardEl.appendChild(button);
       });
+    }
+
+    function renderArt(card) {
+      const style = `style="--tone-a:${card.toneA};--tone-b:${card.toneB};"`;
+      const artMap = {
+        sun: `
+          <svg class="art" viewBox="0 0 120 120" aria-hidden="true" ${style}>
+            <circle class="art-accent-soft" cx="60" cy="60" r="38"></circle>
+            <circle class="art-accent" cx="60" cy="60" r="22"></circle>
+            <path class="art-line" d="M60 8v16M60 96v16M8 60h16M96 60h16M22 22l12 12M86 86l12 12M22 98l12-12M86 34l12-12"></path>
+          </svg>
+        `,
+        moon: `
+          <svg class="art" viewBox="0 0 120 120" aria-hidden="true" ${style}>
+            <circle class="art-accent-soft" cx="58" cy="58" r="32"></circle>
+            <circle fill="#ffffff" cx="72" cy="48" r="28"></circle>
+            <circle class="art-accent" cx="34" cy="34" r="4"></circle>
+            <circle class="art-accent" cx="42" cy="84" r="6"></circle>
+            <circle class="art-accent-soft" cx="83" cy="80" r="5"></circle>
+          </svg>
+        `,
+        leaf: `
+          <svg class="art" viewBox="0 0 120 120" aria-hidden="true" ${style}>
+            <path class="art-accent-soft" d="M92 20c-36 3-58 20-62 48-4 24 14 34 33 29 32-9 39-37 29-77Z"></path>
+            <path class="art-line" d="M39 89c12-19 27-35 45-50M50 71c7 0 16-2 26-8"></path>
+          </svg>
+        `,
+        wave: `
+          <svg class="art" viewBox="0 0 120 120" aria-hidden="true" ${style}>
+            <path class="art-accent-soft" d="M15 73c13 0 13-10 26-10s13 10 26 10 13-10 26-10 13 10 26 10v20H15Z"></path>
+            <path class="art-accent" d="M15 55c13 0 13-10 26-10s13 10 26 10 13-10 26-10 13 10 26 10v11c-13 0-13-10-26-10s-13 10-26 10-13-10-26-10-13 10-26 10-13-10-26-10Z"></path>
+            <path class="art-line" d="M15 55c13 0 13-10 26-10s13 10 26 10 13-10 26-10 13 10 26 10"></path>
+          </svg>
+        `,
+        star: `
+          <svg class="art" viewBox="0 0 120 120" aria-hidden="true" ${style}>
+            <path class="art-accent-soft" d="M60 14l11 23 25 4-18 18 4 25-22-12-22 12 4-25-18-18 25-4Z"></path>
+            <circle class="art-accent" cx="92" cy="28" r="7"></circle>
+            <circle class="art-accent" cx="25" cy="92" r="5"></circle>
+          </svg>
+        `,
+        bolt: `
+          <svg class="art" viewBox="0 0 120 120" aria-hidden="true" ${style}>
+            <path class="art-accent-soft" d="M67 10 27 66h23l-8 44 51-63H68Z"></path>
+            <path class="art-line" d="M67 10 27 66h23l-8 44 51-63H68"></path>
+          </svg>
+        `,
+        mountain: `
+          <svg class="art" viewBox="0 0 120 120" aria-hidden="true" ${style}>
+            <path class="art-accent-soft" d="M12 92 43 42l18 28 12-16 35 38Z"></path>
+            <path class="art-accent" d="M43 42 58 66l-9 0 10 15-16 0-10 11H12Z"></path>
+            <path class="art-line" d="M12 92 43 42l18 28 12-16 35 38"></path>
+          </svg>
+        `,
+        flame: `
+          <svg class="art" viewBox="0 0 120 120" aria-hidden="true" ${style}>
+            <path class="art-accent-soft" d="M62 14c6 23-23 26-18 50 3 15 15 24 28 24 17 0 31-12 31-31 0-21-15-34-41-43Z"></path>
+            <path class="art-accent" d="M58 48c-9 9-15 17-15 29 0 12 8 22 20 22 12 0 21-9 21-22 0-12-7-20-18-29-1 7-4 12-8 16Z"></path>
+          </svg>
+        `,
+        shell: `
+          <svg class="art" viewBox="0 0 120 120" aria-hidden="true" ${style}>
+            <path class="art-accent-soft" d="M60 90c28 0 36-18 36-34 0-19-17-32-36-32S24 37 24 56c0 16 8 34 36 34Z"></path>
+            <path class="art-line" d="M60 28v58M44 32l6 52M76 32l-6 52M30 45l16 32M90 45 74 77"></path>
+          </svg>
+        `,
+        planet: `
+          <svg class="art" viewBox="0 0 120 120" aria-hidden="true" ${style}>
+            <circle class="art-accent-soft" cx="60" cy="58" r="24"></circle>
+            <ellipse class="art-line" cx="60" cy="58" rx="44" ry="14"></ellipse>
+            <ellipse class="art-accent" cx="60" cy="58" rx="44" ry="14"></ellipse>
+            <circle class="art-accent" cx="50" cy="49" r="5"></circle>
+            <circle class="art-accent" cx="70" cy="66" r="4"></circle>
+          </svg>
+        `
+      };
+
+      return artMap[card.art] || artMap.sun;
     }
 
     function startTimerIfNeeded() {
