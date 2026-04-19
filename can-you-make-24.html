@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Can you make 24?</title>
+  <style>
+    :root {
+      --bg-top: #fff4cf;
+      --bg-bottom: #ffd5dc;
+      --panel: rgba(255, 255, 255, 0.78);
+      --panel-strong: rgba(255, 255, 255, 0.92);
+      --text: #2f2140;
+      --muted: #6d617d;
+      --line: rgba(70, 47, 91, 0.12);
+      --pink: #ff6da8;
+      --peach: #ff9b71;
+      --yellow: #ffd85a;
+      --mint: #7de2be;
+      --sky: #7bc8ff;
+      --violet: #8967ff;
+      --success: #199a60;
+      --danger: #cf4664;
+      --shadow: 0 20px 55px rgba(105, 64, 125, 0.16);
+      --radius-xl: 30px;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 20px 16px 40px;
+      font-family: "Trebuchet MS", "Avenir Next", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.8), transparent 28%),
+        radial-gradient(circle at top right, rgba(123, 200, 255, 0.25), transparent 30%),
+        radial-gradient(circle at bottom left, rgba(125, 226, 190, 0.28), transparent 22%),
+        linear-gradient(180deg, var(--bg-top) 0%, #ffe9ef 45%, var(--bg-bottom) 100%);
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      z-index: -1;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      filter: blur(20px);
+      opacity: 0.45;
+    }
+
+    body::before {
+      top: -70px;
+      right: -50px;
+      background: rgba(137, 103, 255, 0.2);
+    }
+
+    body::after {
+      left: -70px;
+      bottom: -40px;
+      background: rgba(255, 109, 168, 0.18);
+    }
+
+    .shell {
+      width: min(100%, 1080px);
+      margin: 0 auto;
+    }
+
+    .hero,
+    .panel {
+      position: relative;
+      overflow: hidden;
+      background: var(--panel);
+      border: 1px solid rgba(255, 255, 255, 0.68);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .hero {
+      padding: 22px;
+      border-radius: 34px;
+    }
+
+    .hero::after,
+    .panel::after {
+      content: "";
+      position: absolute;
+      inset: auto -30px -30px auto;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 216, 90, 0.35), transparent 70%);
+      pointer-events: none;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--violet);
+      text-decoration: none;
+      font-weight: 800;
+      box-shadow: 0 10px 20px rgba(137, 103, 255, 0.12);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(125, 226, 190, 0.95), rgba(123, 200, 255, 0.95));
+      color: #20455f;
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      position: relative;
+      z-index: 1;
+    }
+
+    h1 {
+      margin: 14px 0 12px;
+      font-size: clamp(2.4rem, 9vw, 4.9rem);
+      line-height: 0.95;
+      letter-spacing: 0.02em;
+    }
+
+    .intro {
+      max-width: 58rem;
+      margin: 0;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    .layout {
+      display: grid;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .panel {
+      padding: 20px;
+      border-radius: var(--radius-xl);
+    }
+
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: 1.7rem;
+    }
+
+    .section-copy {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .play-top {
+      display: grid;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .number-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .digit-card {
+      border: 0;
+      border-radius: 22px;
+      min-height: 78px;
+      font: inherit;
+      font-size: clamp(1.9rem, 7vw, 2.7rem);
+      font-weight: 900;
+      color: #2f2140;
+      cursor: pointer;
+      background: linear-gradient(180deg, #ffffff, #fff4fe);
+      box-shadow: 0 14px 24px rgba(137, 103, 255, 0.1);
+      transition: transform 140ms ease, box-shadow 140ms ease, opacity 140ms ease;
+    }
+
+    .digit-card:nth-child(1) {
+      background: linear-gradient(180deg, #fffef6, #ffe7a6);
+    }
+
+    .digit-card:nth-child(2) {
+      background: linear-gradient(180deg, #fff7fb, #ffc7da);
+    }
+
+    .digit-card:nth-child(3) {
+      background: linear-gradient(180deg, #f7fffb, #bff0d8);
+    }
+
+    .digit-card:nth-child(4) {
+      background: linear-gradient(180deg, #f6fbff, #c5e8ff);
+    }
+
+    .digit-card:disabled,
+    .tool-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .digit-card:not(:disabled):hover,
+    .tool-btn:not(:disabled):hover,
+    .action-btn:not(:disabled):hover,
+    .solve-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(105, 64, 125, 0.12);
+    }
+
+    .builder {
+      display: grid;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .expression-box {
+      min-height: 96px;
+      padding: 16px;
+      border-radius: 22px;
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    }
+
+    .expression-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .expression-text {
+      min-height: 42px;
+      font-size: clamp(1.35rem, 4.8vw, 2rem);
+      font-weight: 800;
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
+    .expression-placeholder {
+      color: #a493b6;
+      font-weight: 700;
+    }
+
+    .tool-grid,
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .tool-btn,
+    .action-btn,
+    .solve-btn {
+      border: 0;
+      border-radius: 18px;
+      min-height: 54px;
+      padding: 12px 14px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 140ms ease, box-shadow 140ms ease, opacity 140ms ease;
+    }
+
+    .tool-btn {
+      background: rgba(255, 255, 255, 0.82);
+      color: var(--text);
+      border: 1px solid rgba(86, 54, 111, 0.08);
+    }
+
+    .action-btn {
+      background: linear-gradient(180deg, #ffffff, #f8eeff);
+      color: var(--text);
+    }
+
+    .action-btn.primary,
+    .solve-btn {
+      color: white;
+      background: linear-gradient(135deg, var(--pink), var(--violet));
+      box-shadow: 0 14px 28px rgba(137, 103, 255, 0.2);
+    }
+
+    .status-card,
+    .solution-card,
+    .solver-results {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .status-card {
+      color: var(--text);
+    }
+
+    .status-card.success {
+      background: rgba(125, 226, 190, 0.26);
+      border-color: rgba(25, 154, 96, 0.18);
+      color: #0f6f45;
+    }
+
+    .status-card.error {
+      background: rgba(255, 109, 168, 0.14);
+      border-color: rgba(207, 70, 100, 0.18);
+      color: #8d2845;
+    }
+
+    .mini-heading {
+      margin: 0 0 8px;
+      font-size: 1rem;
+    }
+
+    .solution-text {
+      margin: 0;
+      font-size: 1.08rem;
+      font-weight: 800;
+      line-height: 1.6;
+      word-break: break-word;
+    }
+
+    .solver-grid {
+      display: grid;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .solver-inputs {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .digit-input {
+      width: 100%;
+      min-height: 64px;
+      padding: 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(86, 54, 111, 0.14);
+      background: rgba(255, 255, 255, 0.86);
+      color: var(--text);
+      text-align: center;
+      font: inherit;
+      font-size: 1.8rem;
+      font-weight: 900;
+      outline: none;
+      transition: border-color 140ms ease, box-shadow 140ms ease;
+    }
+
+    .digit-input:focus {
+      border-color: rgba(137, 103, 255, 0.5);
+      box-shadow: 0 0 0 4px rgba(137, 103, 255, 0.12);
+    }
+
+    .solver-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .solve-btn {
+      min-width: 148px;
+    }
+
+    .hint {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .results-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .result-item {
+      padding: 13px 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(86, 54, 111, 0.08);
+      font-weight: 800;
+      line-height: 1.55;
+      word-break: break-word;
+    }
+
+    .result-empty {
+      font-weight: 900;
+      color: #8d2845;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 0.94rem;
+      line-height: 1.55;
+    }
+
+    @media (min-width: 860px) {
+      body {
+        padding: 28px 24px 52px;
+      }
+
+      .layout {
+        grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+        align-items: start;
+      }
+
+      .hero,
+      .panel {
+        padding: 26px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <a class="back-link" href="index.html" aria-label="Back to app library">← Back to apps</a>
+      <div class="eyebrow">Playful Math Puzzle</div>
+      <h1>Can you make 24?</h1>
+      <p class="intro">
+        Use all four digits exactly once to make 24 with +, −, ×, ÷, and parentheses.
+        Tap the cards and buttons to build your answer in play mode, or test any four digits in the solver below.
+      </p>
+    </section>
+
+    <div class="layout">
+      <section class="panel" aria-labelledby="play-heading">
+        <h2 id="play-heading">Play</h2>
+        <p class="section-copy">
+          Every puzzle here is guaranteed to have at least one valid solution.
+          Build your expression step by step and check whether you made exactly 24.
+        </p>
+
+        <div class="play-top">
+          <div class="number-row" id="play-digits" aria-label="Puzzle digits"></div>
+        </div>
+
+        <div class="builder">
+          <div class="expression-box" aria-live="polite">
+            <div class="expression-label">
+              <span>Your expression</span>
+              <span id="use-count">0 of 4 digits used</span>
+            </div>
+            <div class="expression-text" id="expression-display">
+              <span class="expression-placeholder">Tap a number card to begin.</span>
+            </div>
+          </div>
+
+          <div class="tool-grid" id="operator-buttons" aria-label="Math buttons">
+            <button class="tool-btn" type="button" data-token="op" data-value="+">+</button>
+            <button class="tool-btn" type="button" data-token="op" data-value="-">−</button>
+            <button class="tool-btn" type="button" data-token="op" data-value="*">×</button>
+            <button class="tool-btn" type="button" data-token="op" data-value="/">÷</button>
+            <button class="tool-btn" type="button" data-token="paren" data-value="(">(</button>
+            <button class="tool-btn" type="button" data-token="paren" data-value=")">)</button>
+          </div>
+
+          <div class="action-grid" aria-label="Play actions">
+            <button class="action-btn" type="button" id="undo-btn">Undo</button>
+            <button class="action-btn" type="button" id="clear-btn">Clear</button>
+            <button class="action-btn primary" type="button" id="check-btn">Check</button>
+            <button class="action-btn" type="button" id="new-puzzle-btn">New Puzzle</button>
+            <button class="action-btn" type="button" id="show-solution-btn">Show Solution</button>
+          </div>
+        </div>
+
+        <div class="status-card" id="play-status" aria-live="polite">
+          Your puzzle is ready. Can you make 24?
+        </div>
+
+        <div class="solution-card" id="play-solution" hidden>
+          <h3 class="mini-heading">One solution</h3>
+          <p class="solution-text" id="play-solution-text"></p>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="solver-heading">
+        <h2 id="solver-heading">Solver</h2>
+        <p class="section-copy">
+          Try your own four digits from 1 to 9. If a solution exists, the solver will show up to 10 distinct ways to make 24.
+        </p>
+
+        <div class="solver-grid">
+          <div class="solver-inputs" aria-label="Solver digit inputs">
+            <input class="digit-input" inputmode="numeric" maxlength="1" aria-label="Digit 1" data-solver-index="0">
+            <input class="digit-input" inputmode="numeric" maxlength="1" aria-label="Digit 2" data-solver-index="1">
+            <input class="digit-input" inputmode="numeric" maxlength="1" aria-label="Digit 3" data-solver-index="2">
+            <input class="digit-input" inputmode="numeric" maxlength="1" aria-label="Digit 4" data-solver-index="3">
+          </div>
+
+          <div class="solver-actions">
+            <button class="solve-btn" type="button" id="solve-btn">Solve</button>
+          </div>
+
+          <p class="hint">
+            Enter exactly one digit from 1 to 9 in each box. Repeated digits are welcome. Zero is not allowed.
+          </p>
+        </div>
+
+        <div class="solver-results" id="solver-results" aria-live="polite">
+          Enter four digits, then tap Solve.
+        </div>
+
+        <p class="footer-note">
+          Tip: parentheses matter. The same four digits can change a lot depending on the order you combine them.
+        </p>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const DISPLAY_MAP = {
+      "+": "+",
+      "-": "\u2212",
+      "*": "\u00d7",
+      "/": "\u00f7",
+      "(": "(",
+      ")": ")"
+    };
+
+    const playDigitsEl = document.getElementById("play-digits");
+    const expressionDisplayEl = document.getElementById("expression-display");
+    const useCountEl = document.getElementById("use-count");
+    const playStatusEl = document.getElementById("play-status");
+    const playSolutionEl = document.getElementById("play-solution");
+    const playSolutionTextEl = document.getElementById("play-solution-text");
+    const solverResultsEl = document.getElementById("solver-results");
+    const undoBtn = document.getElementById("undo-btn");
+    const clearBtn = document.getElementById("clear-btn");
+    const checkBtn = document.getElementById("check-btn");
+    const newPuzzleBtn = document.getElementById("new-puzzle-btn");
+    const showSolutionBtn = document.getElementById("show-solution-btn");
+    const toolButtons = Array.from(document.querySelectorAll("#operator-buttons .tool-btn"));
+    const solverInputs = Array.from(document.querySelectorAll(".digit-input"));
+
+    const playState = {
+      digits: [],
+      tokens: [],
+      history: [],
+      solutions: []
+    };
+
+    function gcd(a, b) {
+      let x = Math.abs(a);
+      let y = Math.abs(b);
+      while (y !== 0) {
+        const temp = x % y;
+        x = y;
+        y = temp;
+      }
+      return x || 1;
+    }
+
+    function makeFraction(n, d) {
+      if (d === 0) {
+        return null;
+      }
+      let numerator = n;
+      let denominator = d;
+      if (denominator < 0) {
+        numerator *= -1;
+        denominator *= -1;
+      }
+      const divisor = gcd(numerator, denominator);
+      return {
+        n: numerator / divisor,
+        d: denominator / divisor
+      };
+    }
+
+    function addFractions(a, b) {
+      return makeFraction(a.n * b.d + b.n * a.d, a.d * b.d);
+    }
+
+    function subtractFractions(a, b) {
+      return makeFraction(a.n * b.d - b.n * a.d, a.d * b.d);
+    }
+
+    function multiplyFractions(a, b) {
+      return makeFraction(a.n * b.n, a.d * b.d);
+    }
+
+    function divideFractions(a, b) {
+      if (b.n === 0) {
+        return null;
+      }
+      return makeFraction(a.n * b.d, a.d * b.n);
+    }
+
+    function fractionEquals24(value) {
+      return value && value.n === 24 * value.d;
+    }
+
+    function formatExpression(tokens) {
+      return tokens.map((token) => {
+        if (token.type === "number") {
+          return String(token.value);
+        }
+        return DISPLAY_MAP[token.value] || token.value;
+      }).join(" ");
+    }
+
+    function escapeHtml(text) {
+      return text
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
+
+    function setPlayMessage(message, kind = "neutral") {
+      playStatusEl.textContent = message;
+      playStatusEl.className = "status-card";
+      if (kind === "success") {
+        playStatusEl.classList.add("success");
+      } else if (kind === "error") {
+        playStatusEl.classList.add("error");
+      }
+    }
+
+    function nextTokenNeedsValue() {
+      if (playState.tokens.length === 0) {
+        return true;
+      }
+
+      const last = playState.tokens[playState.tokens.length - 1];
+      return last.type === "op" || (last.type === "paren" && last.value === "(");
+    }
+
+    function getUnmatchedOpenCount() {
+      let count = 0;
+      for (const token of playState.tokens) {
+        if (token.type === "paren") {
+          count += token.value === "(" ? 1 : -1;
+        }
+      }
+      return count;
+    }
+
+    function usedDigitCount() {
+      return playState.tokens.filter((token) => token.type === "number").length;
+    }
+
+    function canUseNumberCard(cardId) {
+      return !playState.tokens.some((token) => token.type === "number" && token.cardId === cardId);
+    }
+
+    function captureSnapshot() {
+      return {
+        tokens: playState.tokens.map((token) => ({ ...token }))
+      };
+    }
+
+    function restoreSnapshot(snapshot) {
+      playState.tokens = snapshot.tokens.map((token) => ({ ...token }));
+      renderPlayState();
+    }
+
+    function pushHistory() {
+      playState.history.push(captureSnapshot());
+    }
+
+    function addToken(token) {
+      pushHistory();
+      playState.tokens.push(token);
+      renderPlayState();
+    }
+
+    function renderDigitCards() {
+      playDigitsEl.innerHTML = "";
+      playState.digits.forEach((digitCard) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "digit-card";
+        button.textContent = String(digitCard.value);
+        button.disabled = !canUseNumberCard(digitCard.id) || !nextTokenNeedsValue();
+        button.addEventListener("click", () => {
+          addToken({
+            type: "number",
+            value: digitCard.value,
+            cardId: digitCard.id
+          });
+        });
+        playDigitsEl.appendChild(button);
+      });
+    }
+
+    function renderExpression() {
+      if (playState.tokens.length === 0) {
+        expressionDisplayEl.innerHTML = '<span class="expression-placeholder">Tap a number card to begin.</span>';
+        return;
+      }
+      expressionDisplayEl.innerHTML = escapeHtml(formatExpression(playState.tokens));
+    }
+
+    function renderToolButtons() {
+      const needValue = nextTokenNeedsValue();
+      const unmatched = getUnmatchedOpenCount();
+      const digitsLeft = playState.digits.length - usedDigitCount();
+      const canClose = !needValue && unmatched > 0;
+
+      toolButtons.forEach((button) => {
+        const { token, value } = button.dataset;
+        let enabled = true;
+
+        if (token === "op") {
+          enabled = !needValue && digitsLeft > 0;
+        } else if (token === "paren" && value === "(") {
+          enabled = needValue && digitsLeft > 0;
+        } else if (token === "paren" && value === ")") {
+          enabled = canClose;
+        }
+
+        button.disabled = !enabled;
+      });
+    }
+
+    function renderPlayState() {
+      renderDigitCards();
+      renderExpression();
+      renderToolButtons();
+      useCountEl.textContent = usedDigitCount() + " of 4 digits used";
+      undoBtn.disabled = playState.history.length === 0;
+      clearBtn.disabled = playState.tokens.length === 0;
+    }
+
+    function createStartItems(digits) {
+      return digits.map((digit, index) => ({
+        value: makeFraction(digit, 1),
+        expr: String(digit),
+        canonical: String(digit) + "#" + index
+      }));
+    }
+
+    function combinePair(a, b) {
+      const results = [];
+      const orderedCanon = [a.canonical, b.canonical].sort();
+
+      results.push({
+        value: addFractions(a.value, b.value),
+        expr: "(" + a.expr + " + " + b.expr + ")",
+        canonical: "(+ " + orderedCanon[0] + " " + orderedCanon[1] + ")"
+      });
+
+      results.push({
+        value: multiplyFractions(a.value, b.value),
+        expr: "(" + a.expr + " \u00d7 " + b.expr + ")",
+        canonical: "(* " + orderedCanon[0] + " " + orderedCanon[1] + ")"
+      });
+
+      results.push({
+        value: subtractFractions(a.value, b.value),
+        expr: "(" + a.expr + " \u2212 " + b.expr + ")",
+        canonical: "(- " + a.canonical + " " + b.canonical + ")"
+      });
+
+      results.push({
+        value: subtractFractions(b.value, a.value),
+        expr: "(" + b.expr + " \u2212 " + a.expr + ")",
+        canonical: "(- " + b.canonical + " " + a.canonical + ")"
+      });
+
+      const divideAB = divideFractions(a.value, b.value);
+      if (divideAB) {
+        results.push({
+          value: divideAB,
+          expr: "(" + a.expr + " \u00f7 " + b.expr + ")",
+          canonical: "(/ " + a.canonical + " " + b.canonical + ")"
+        });
+      }
+
+      const divideBA = divideFractions(b.value, a.value);
+      if (divideBA) {
+        results.push({
+          value: divideBA,
+          expr: "(" + b.expr + " \u00f7 " + a.expr + ")",
+          canonical: "(/ " + b.canonical + " " + a.canonical + ")"
+        });
+      }
+
+      return results.filter((item) => item.value !== null);
+    }
+
+    function findSolutionsForDigits(digits, limit = 10) {
+      const found = new Map();
+
+      function search(items) {
+        if (found.size >= limit) {
+          return;
+        }
+
+        if (items.length === 1) {
+          if (fractionEquals24(items[0].value)) {
+            const cleanExpr = items[0].expr.startsWith("(") && items[0].expr.endsWith(")")
+              ? items[0].expr.slice(1, -1)
+              : items[0].expr;
+            found.set(cleanExpr, cleanExpr);
+          }
+          return;
+        }
+
+        const seenAtLevel = new Set();
+
+        for (let i = 0; i < items.length; i += 1) {
+          for (let j = i + 1; j < items.length; j += 1) {
+            const rest = items.filter((_, index) => index !== i && index !== j);
+            const combos = combinePair(items[i], items[j]);
+
+            for (const combo of combos) {
+              const nextKey = combo.canonical + " | " + rest.map((item) => item.canonical).sort().join(",");
+              if (seenAtLevel.has(nextKey)) {
+                continue;
+              }
+              seenAtLevel.add(nextKey);
+              search([...rest, combo]);
+              if (found.size >= limit) {
+                return;
+              }
+            }
+          }
+        }
+      }
+
+      search(createStartItems(digits));
+      return Array.from(found.values());
+    }
+
+    function randomDigit() {
+      return Math.floor(Math.random() * 9) + 1;
+    }
+
+    function makeNewPuzzle() {
+      let digits = [];
+      let solutions = [];
+
+      do {
+        digits = [randomDigit(), randomDigit(), randomDigit(), randomDigit()];
+        solutions = findSolutionsForDigits(digits, 1);
+      } while (solutions.length === 0);
+
+      playState.digits = digits.map((value, index) => ({ value, id: "digit-" + index + "-" + value }));
+      playState.tokens = [];
+      playState.history = [];
+      playState.solutions = solutions;
+      playSolutionEl.hidden = true;
+      playSolutionTextEl.textContent = "";
+      setPlayMessage("Your puzzle is ready. Can you make 24?");
+      renderPlayState();
+    }
+
+    function undoPlayMove() {
+      if (playState.history.length === 0) {
+        return;
+      }
+      const previous = playState.history.pop();
+      restoreSnapshot(previous);
+      setPlayMessage("Step undone. Keep going!");
+    }
+
+    function clearPlayMoves() {
+      if (playState.tokens.length === 0) {
+        return;
+      }
+      pushHistory();
+      playState.tokens = [];
+      renderPlayState();
+      setPlayMessage("Expression cleared. Ready for another try.");
+    }
+
+    function tokenizeForParser(tokens) {
+      return tokens.map((token) => {
+        if (token.type === "number") {
+          return { type: "number", value: token.value };
+        }
+        if (token.type === "op") {
+          return { type: token.value, value: token.value };
+        }
+        return { type: token.value, value: token.value };
+      });
+    }
+
+    function evaluateTokens(tokens) {
+      const parserTokens = tokenizeForParser(tokens);
+      let index = 0;
+
+      function current() {
+        return parserTokens[index];
+      }
+
+      function parseExpression() {
+        let left = parseTerm();
+        while (current() && (current().type === "+" || current().type === "-")) {
+          const op = current().type;
+          index += 1;
+          const right = parseTerm();
+          if (!left || !right) {
+            return null;
+          }
+          left = op === "+" ? addFractions(left, right) : subtractFractions(left, right);
+        }
+        return left;
+      }
+
+      function parseTerm() {
+        let left = parseFactor();
+        while (current() && (current().type === "*" || current().type === "/")) {
+          const op = current().type;
+          index += 1;
+          const right = parseFactor();
+          if (!left || !right) {
+            return null;
+          }
+          left = op === "*" ? multiplyFractions(left, right) : divideFractions(left, right);
+          if (!left) {
+            return null;
+          }
+        }
+        return left;
+      }
+
+      function parseFactor() {
+        const token = current();
+        if (!token) {
+          return null;
+        }
+
+        if (token.type === "number") {
+          index += 1;
+          return makeFraction(token.value, 1);
+        }
+
+        if (token.type === "(") {
+          index += 1;
+          const value = parseExpression();
+          if (!value || !current() || current().type !== ")") {
+            return null;
+          }
+          index += 1;
+          return value;
+        }
+
+        return null;
+      }
+
+      const result = parseExpression();
+      if (!result || index !== parserTokens.length) {
+        return null;
+      }
+      return result;
+    }
+
+    function checkPlayExpression() {
+      const digitsUsed = usedDigitCount();
+      const unmatched = getUnmatchedOpenCount();
+
+      if (digitsUsed < 4) {
+        setPlayMessage("You still need to use all 4 digits.", "error");
+        return;
+      }
+
+      if (nextTokenNeedsValue() || unmatched !== 0) {
+        setPlayMessage("This expression is incomplete.", "error");
+        return;
+      }
+
+      const value = evaluateTokens(playState.tokens);
+      if (!value) {
+        setPlayMessage("That expression does not work. Try a different combo.", "error");
+        return;
+      }
+
+      if (fractionEquals24(value)) {
+        setPlayMessage("Nice work \u2014 you made 24!", "success");
+        return;
+      }
+
+      const numeric = value.n / value.d;
+      const shown = Number.isInteger(numeric) ? String(numeric) : numeric.toFixed(2).replace(/\.?0+$/, "");
+      setPlayMessage("That equals " + shown + ", not 24.", "error");
+    }
+
+    function showPlaySolution() {
+      if (!playState.solutions.length) {
+        setPlayMessage("No saved solution was found for this puzzle.", "error");
+        return;
+      }
+      playSolutionTextEl.textContent = playState.solutions[0] + " = 24";
+      playSolutionEl.hidden = false;
+      setPlayMessage("Here is one valid way to make 24.");
+    }
+
+    function sanitizeSolverInput(input) {
+      const match = input.value.match(/[1-9]/);
+      input.value = match ? match[0] : "";
+    }
+
+    function solveCustomDigits() {
+      const digits = solverInputs.map((input) => Number(input.value));
+
+      if (digits.some((digit) => !Number.isInteger(digit) || digit < 1 || digit > 9)) {
+        solverResultsEl.innerHTML = '<div class="result-empty">Please enter one digit from 1 to 9 in each box.</div>';
+        return;
+      }
+
+      const solutions = findSolutionsForDigits(digits, 10);
+
+      if (solutions.length === 0) {
+        solverResultsEl.innerHTML = '<div class="result-empty">No solution</div>';
+        return;
+      }
+
+      const resultItems = solutions.map((solution) => (
+        '<div class="result-item">' + escapeHtml(solution) + " = 24</div>"
+      )).join("");
+
+      solverResultsEl.innerHTML =
+        '<div><strong>' + solutions.length + "</strong> solution" + (solutions.length === 1 ? "" : "s") +
+        ' found.</div><div class="results-list">' + resultItems + "</div>";
+    }
+
+    toolButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const type = button.dataset.token === "op" ? "op" : "paren";
+        addToken({
+          type,
+          value: button.dataset.value
+        });
+      });
+    });
+
+    undoBtn.addEventListener("click", undoPlayMove);
+    clearBtn.addEventListener("click", clearPlayMoves);
+    checkBtn.addEventListener("click", checkPlayExpression);
+    newPuzzleBtn.addEventListener("click", makeNewPuzzle);
+    showSolutionBtn.addEventListener("click", showPlaySolution);
+
+    solverInputs.forEach((input, index) => {
+      input.addEventListener("input", () => {
+        sanitizeSolverInput(input);
+        if (input.value && index < solverInputs.length - 1) {
+          solverInputs[index + 1].focus();
+          solverInputs[index + 1].select();
+        }
+      });
+
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Backspace" && !input.value && index > 0) {
+          solverInputs[index - 1].focus();
+          solverInputs[index - 1].select();
+        }
+      });
+
+      input.addEventListener("focus", () => input.select());
+    });
+
+    document.getElementById("solve-btn").addEventListener("click", solveCustomDigits);
+
+    makeNewPuzzle();
+  </script>
+</body>
+</html>
